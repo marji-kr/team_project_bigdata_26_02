@@ -222,7 +222,7 @@ def write_report(df: pd.DataFrame, overall: pd.Series, sim: np.ndarray, path: Pa
         "|---|---|---|---|---|---|",
     ]
     for lab, (_, r) in zip(labels, df.iterrows()):
-        pdf = f" · [PDF](../{r['pdf_path']})" if isinstance(r.get("pdf_path"), str) else ""
+        pdf = f" · [PDF]({r['pdf_url']})" if isinstance(r.get("pdf_url"), str) else ""
         lines.append(f"| {lab} | [{r['title']}]({r['url']}){pdf} | {r['published']} | {_fmt(r.get('n_pages'))} "
                      f"| {r['ml_method']} | {r['finance_task']} |")
 

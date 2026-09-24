@@ -3,3 +3,6 @@ __pycache__/
 *.pyc
 .ipynb_checkpoints/
 desktop.ini
+
+# 논문 PDF 원본은 저작권 때문에 GitHub 에 올리지 않음 (로컬에만 보관)
+data/pdfs/

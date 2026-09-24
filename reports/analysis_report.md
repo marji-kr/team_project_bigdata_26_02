@@ -1,6 +1,6 @@
 # 금융 머신러닝 최신 논문 자동 분석 리포트
 
-- 생성 시각: 2026-09-24 15:04
+- 생성 시각: 2026-09-24 15:09
 - 논문 수: 5편 (출처: arxiv) · PDF 본문 분석 5편
 - 전체 상위 키워드: return, risk, time, stock, ratio, trading, financial, optimal, day, portfolio
 
@@ -8,11 +8,11 @@
 
 | # | 제목 | 게재일 | 쪽수 | ML 방법론 | 금융 과제 |
 |---|---|---|---|---|---|
-| P1 | [Propose, Don't Judge: An Anytime-Valid Referee for LLM Agents That Mine Investment Factors](http://arxiv.org/abs/2609.27051v1) · [PDF](../data/pdfs/2609.27051v1.pdf) | 2026-09-22 | 37 | LLM / Foundation Model; Reinforcement Learning | Trading / Execution; Risk / Volatility |
-| P2 | [Hierarchical Multi-Task Learning with Liquidity-Aware Signals for Stock Forecasting](http://arxiv.org/abs/2609.25617v1) · [PDF](../data/pdfs/2609.25617v1.pdf) | 2026-09-22 | 9 | Transformer / Attention; RNN / LSTM; Tree Ensemble; Deep Learning (general); Multi-task / Transfer | Return / Price Prediction; Portfolio Optimization; Trading / Execution; Risk / Volatility |
-| P3 | [The Informational Content in Lepto-Variance and Its Relation to Higher Moments](http://arxiv.org/abs/2609.25144v1) · [PDF](../data/pdfs/2609.25144v1.pdf) | 2026-09-21 | 16 | Machine Learning (general) | Risk / Volatility |
-| P4 | [Risk Measures under Paired-Ambiguity: A Deep Learning Reflected BSDE Framework](http://arxiv.org/abs/2609.23768v1) · [PDF](../data/pdfs/2609.23768v1.pdf) | 2026-09-20 | 31 | Deep Learning (general) | Risk / Volatility |
-| P5 | [Financial Language Models as Applied Artificial Intelligence Systems for News-Based Trading under Market Frictions](http://arxiv.org/abs/2609.23703v1) · [PDF](../data/pdfs/2609.23703v1.pdf) | 2026-09-20 | 47 | LLM / Foundation Model; Transformer / Attention; Deep Learning (general); Machine Learning (general) | Return / Price Prediction; Portfolio Optimization; Trading / Execution |
+| P1 | [Propose, Don't Judge: An Anytime-Valid Referee for LLM Agents That Mine Investment Factors](http://arxiv.org/abs/2609.27051v1) · [PDF](https://arxiv.org/pdf/2609.27051v1) | 2026-09-22 | 37 | LLM / Foundation Model; Reinforcement Learning | Trading / Execution; Risk / Volatility |
+| P2 | [Hierarchical Multi-Task Learning with Liquidity-Aware Signals for Stock Forecasting](http://arxiv.org/abs/2609.25617v1) · [PDF](https://arxiv.org/pdf/2609.25617v1) | 2026-09-22 | 9 | Transformer / Attention; RNN / LSTM; Tree Ensemble; Deep Learning (general); Multi-task / Transfer | Return / Price Prediction; Portfolio Optimization; Trading / Execution; Risk / Volatility |
+| P3 | [The Informational Content in Lepto-Variance and Its Relation to Higher Moments](http://arxiv.org/abs/2609.25144v1) · [PDF](https://arxiv.org/pdf/2609.25144v1) | 2026-09-21 | 16 | Machine Learning (general) | Risk / Volatility |
+| P4 | [Risk Measures under Paired-Ambiguity: A Deep Learning Reflected BSDE Framework](http://arxiv.org/abs/2609.23768v1) · [PDF](https://arxiv.org/pdf/2609.23768v1) | 2026-09-20 | 31 | Deep Learning (general) | Risk / Volatility |
+| P5 | [Financial Language Models as Applied Artificial Intelligence Systems for News-Based Trading under Market Frictions](http://arxiv.org/abs/2609.23703v1) · [PDF](https://arxiv.org/pdf/2609.23703v1) | 2026-09-20 | 47 | LLM / Foundation Model; Transformer / Attention; Deep Learning (general); Machine Learning (general) | Return / Price Prediction; Portfolio Optimization; Trading / Execution |
 
 ## 2. 논문별 분석
 
