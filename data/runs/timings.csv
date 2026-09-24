@@ -1,0 +1,7 @@
+timestamp,stage,approach,seconds,n_papers,note
+2026-09-24T15:24:41,collect,auto,36.81,,
+2026-09-24T15:24:41,clean,auto,0.35,858,
+2026-09-24T15:24:42,classify,keyword,1.08,524,
+2026-09-24T15:24:46,report,keyword,1.57,524,
+2026-09-24T15:25:41,report,keyword,1.55,524,
+2026-09-24T15:26:56,report,keyword,1.47,524,

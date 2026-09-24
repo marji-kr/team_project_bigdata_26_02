@@ -1,0 +1,9 @@
+{
+  "reference_date": "2026-09-24",
+  "window_months": 6,
+  "queries": {
+    "qfin_x_ml": "(cat:q-fin.CP OR cat:q-fin.PM OR cat:q-fin.ST OR cat:q-fin.TR OR cat:q-fin.RM OR cat:q-fin.MF OR cat:q-fin.GN OR cat:q-fin.PR) AND (abs:\"machine learning\" OR abs:\"deep learning\" OR abs:\"neural network\" OR abs:\"language model\" OR abs:\"reinforcement learning\" OR abs:transformer OR abs:LLM)",
+    "ml_x_fin": "(cat:cs.LG OR cat:cs.AI OR cat:cs.CL OR cat:stat.ML OR cat:cs.CE) AND (abs:\"stock\" OR abs:\"portfolio\" OR abs:\"asset pricing\" OR abs:\"financial market\" OR abs:\"quantitative trading\" OR abs:\"algorithmic trading\" OR abs:\"credit risk\" OR abs:\"cryptocurrency\" OR abs:\"option pricing\" OR abs:\"financial time series\")"
+  },
+  "n_raw": 858
+}

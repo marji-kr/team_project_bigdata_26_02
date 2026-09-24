@@ -1,0 +1,6 @@
+﻿approach,step,annotator,minutes,note
+manual,search_collect,,,검색·수집·정리
+manual,read_classify,,,100건 초록 읽고 라벨링
+manual,write_report,,,같은 형식의 보고서 작성
+ai_review,review_labels,,,AI 결과 검토·수정
+ai_review,review_report,,,AI 보고서 검토·수정

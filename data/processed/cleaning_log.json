@@ -1,0 +1,20 @@
+{
+  "raw_rows": 858,
+  "missing_title": 0,
+  "missing_abstract": 0,
+  "missing_published": 0,
+  "missing_url": 0,
+  "duplicates_removed": 89,
+  "dropped_not_ml": 240,
+  "dropped_not_finance": 5,
+  "after_filter": 524,
+  "final_rows": 524,
+  "per_month": {
+    "2026-03": 84,
+    "2026-04": 66,
+    "2026-05": 100,
+    "2026-06": 93,
+    "2026-07": 76,
+    "2026-08": 105
+  }
+}
