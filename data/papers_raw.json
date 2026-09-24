@@ -1,0 +1,70 @@
+{
+  "collected_at": "2026-09-24T14:54:19",
+  "papers": [
+    {
+      "id": "2609.27051v1",
+      "title": "Propose, Don't Judge: An Anytime-Valid Referee for LLM Agents That Mine Investment Factors",
+      "authors": "Bo Qu, Mingguang Chen, Licheng Wang",
+      "published": "2026-09-22",
+      "venue": "arXiv",
+      "abstract": "Language-model agents now run the whole of quantitative factor research: they propose investment factors, backtest them, select the survivors and retire them. We ask which of those jobs an agent should keep. Our answer is governed self-evolution: the agent may propose, and a frozen statistical referee that the agent cannot touch must judge. The referee scores each candidate only on market outcomes revealed after submission, by betting, so its false-discovery guarantee holds at every stopping time for any proposal policy. We cross three proposers (a script, a bandit and a language model) with this referee and with three deliberately leaky ones, in a synthetic world with planted truth, a probe-authoring environment and a ten-year walk-forward on the CSI 500. Who judges sets the number of false admissions: the frozen referee admits 5-11 times fewer sub-threshold factors than the leaky referees under a scripted proposer, and no proposer closes that gap. Who proposes sets the yield: the language model beats the script, matches the bandit, and adds the one capability a bandit lacks, writing its own diagnostic probes. The certificate's price is time: an admitted true factor waits about 500 trading days, and the certified portfolio's Sharpe ratio therefore trails an ungated one. Judging belongs to the procedure; proposing and instrument-making belong to the agent.",
+      "categories": "cs.AI, q-fin.PM, q-fin.ST",
+      "cited_by": null,
+      "url": "http://arxiv.org/abs/2609.27051v1",
+      "pdf_url": "https://arxiv.org/pdf/2609.27051v1",
+      "source": "arxiv"
+    },
+    {
+      "id": "2609.25617v1",
+      "title": "Hierarchical Multi-Task Learning with Liquidity-Aware Signals for Stock Forecasting",
+      "authors": "Hengyi Yang, Sida Lin, Yiyan Qi, Yankai Chen, Haohan Zhang, Xianhua Peng, Jian Guo",
+      "published": "2026-09-22",
+      "venue": "arXiv",
+      "abstract": "Stock price forecasting is a long-standing challenge in computational finance, driven by the inherent randomness of markets and complex temporal patterns. While recent deep-learning models have raised forecasting accuracy by jointly modeling inter-stock and temporal price dynamics, they conflate inter-stock relationships with intra-stock temporal dependencies and focus solely on the univariate objective of price movement. To address these limitations, we propose LiMT, a Hierarchical Multi-Task Learning framework that integrates liquidity-aware signals for stock price forecasting. LiMT employs a Market Regime Encoder (MRE) module that first extracts contemporaneous cross-stock dependencies, then models each stock's temporal dynamics, yielding a unified latent state. Building on this latent state, we introduce a Liquidity-Driven Learning (LDL) module, a mixture-of-experts architecture that features cross-task gating mechanisms to jointly predict price movement, volatility, and trading volume. We further design an Adaptive Portfolio Optimization (APO) mechanism that converts multi-task forecasts into executable portfolio weights under transaction-cost and liquidity constraints. Extensive experiments on the CSI300 and CSI500 benchmarks show that LiMT performs best among strong neural and tree-based baselines across the reported metrics. In realistic CSI300 backtests, APO improves annualized return from 3.99% to 10.01% and Sharpe ratio from 1.22 to 1.86 over equal weighting, showing that the multi-task forecasts translate into deployable portfolio gains.",
+      "categories": "cs.CE, q-fin.CP",
+      "cited_by": null,
+      "url": "http://arxiv.org/abs/2609.25617v1",
+      "pdf_url": "https://arxiv.org/pdf/2609.25617v1",
+      "source": "arxiv"
+    },
+    {
+      "id": "2609.25144v1",
+      "title": "The Informational Content in Lepto-Variance and Its Relation to Higher Moments",
+      "authors": "Vassilis Polimenis",
+      "published": "2026-09-21",
+      "venue": "arXiv",
+      "abstract": "Lepto-regression is defined as the machine learning process of constructing a Regression Tree of a target feature on itself. It is a novel, model-free method potentially revealing information on important sample structure properties. But it is yet not clear what the informational content of lepto-variance is and how it is related to other well-known statistics of a sample. One significant finding is that 58% of the historical US stock return variability is 1-bit lepto-variance that can not be explained by any financial factor. The central question investigated in this paper is to use small normal N(0, 1) drawn samples to explore how the 1-bit sample lepto-variance and lepto-ratio relate to sample variance, skewness and excess kurtosis. Using a large sample simulation, the lepto ratio of a normal is found to converge to 36.3%. For smaller normally distributed simulated N(0, 1) samples, while lepto-variance itself is highly correlated to sample variance, lepto-variance as a fraction of total variance is highly correlated to excess kurtosis. Both lepto-variance and lepto-ratio are orthogonal to sample skew. Another finding is that while lepto-ratio is strongly correlated to lepto-variance it remains orthogonal to sample variance.",
+      "categories": "stat.ME, cs.LG, q-fin.RM, stat.ML",
+      "cited_by": null,
+      "url": "http://arxiv.org/abs/2609.25144v1",
+      "pdf_url": "https://arxiv.org/pdf/2609.25144v1",
+      "source": "arxiv"
+    },
+    {
+      "id": "2609.23768v1",
+      "title": "Risk Measures under Paired-Ambiguity: A Deep Learning Reflected BSDE Framework",
+      "authors": "Nacira Agram, Jan Rems, Emanuela Rosazza Gianin",
+      "published": "2026-09-20",
+      "venue": "arXiv",
+      "abstract": "We study optimal stopping under dynamic risk measures with simultaneous ambiguity in the probability model and the discount rate. We introduce a paired ambiguity framework combining Girsanov model uncertainty with cash subadditive risk evaluation and characterize the stopping value by an upper reflected backward stochastic differential equation (BSDE). We establish structural properties of the resulting stopping operator and study quadratic drivers associated with entropic risk measures, obtaining explicit stopping rules in several benchmark cases. We then develop a deep learning scheme for the reflected quadratic BSDE. The convergence analysis uses discrete reflection and truncation to reduce the quadratic problem to a globally Lipschitz system and combines reflected BSDE discretization estimates with neural network approximation errors. Numerical experiments for American options illustrate the effects of discount rate and entropic ambiguity on stopping values and exercise decisions.",
+      "categories": "q-fin.RM, math.PR",
+      "cited_by": null,
+      "url": "http://arxiv.org/abs/2609.23768v1",
+      "pdf_url": "https://arxiv.org/pdf/2609.23768v1",
+      "source": "arxiv"
+    },
+    {
+      "id": "2609.23703v1",
+      "title": "Financial Language Models as Applied Artificial Intelligence Systems for News-Based Trading under Market Frictions",
+      "authors": "Kemal Kirtac",
+      "published": "2026-09-20",
+      "venue": "arXiv",
+      "abstract": "Financial language models can transform unstructured firm-specific news into structured decision signals, but financial AI research lacks an integrated deployment framework for evaluating whether those signals remain useful in financial decision systems. Computer science research has developed strong methods for time-series forecasting, text classification, multimodal stock prediction, graph-based market modeling, and machine-learning operations, yet these streams do not provide a domain-specific protocol that jointly tests financial language-model outputs under event-time observability, probability calibration, execution timing, transaction costs, liquidity constraints, capacity limits, operational diagnostics, and statistical inference. We introduce MFAST, a Market-Friction-Aware Sentiment-to-Trading framework that converts timestamped financial text into auditable, reproducible, and market-feasible trading decisions. The application is news-based trading, where firm-specific text must be linked to securities before portfolio decisions can be evaluated. The framework links Refinitiv News Analytics to Center for Research in Security Prices (CRSP) equity data, restricts the primary out-of-sample evaluation to post-release news outside disclosed foundation-model data-freshness periods, and adds a public replication arm using open financial text and public price data. Results show that decoder-only language models outperform encoder baselines and dictionary sentiment in classification, calibration, return prediction, and net portfolio performance, while operational diagnostics reveal trade-offs among accuracy, latency, memory, throughput, and inference cost. The paper shows that credible evaluation of financial language models requires an end-to-end engineering approach combining language understanding, temporal discipline, market-friction-aware deployment, and reproducible validation.",
+      "categories": "cs.CL, cs.LG, q-fin.TR",
+      "cited_by": null,
+      "url": "http://arxiv.org/abs/2609.23703v1",
+      "pdf_url": "https://arxiv.org/pdf/2609.23703v1",
+      "source": "arxiv"
+    }
+  ]
+}
