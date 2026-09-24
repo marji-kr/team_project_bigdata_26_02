@@ -1,0 +1,2053 @@
+Risk Measures under Paired-Ambiguity: A Deep Learning
+Reflected BSDE Framework
+Nacira Agram 1, Jan Rems 2 and Emanuela Rosazza Gianin 3
+September 22, 2026
+Abstract
+We study optimal stopping under dynamic risk measures with simultaneous ambiguity
+in the probability model and the discount rate. We introduce a paired ambiguity framework
+combining Girsanov model uncertainty with cash subadditive risk evaluation and characterize the stopping value by an upper reflected backward stochastic differential equation
+(BSDE). We establish structural properties of the resulting stopping operator and study
+quadratic drivers associated with entropic risk measures, obtaining explicit stopping rules
+in several benchmark cases.
+We then develop a deep learning scheme for the reflected
+quadratic BSDE. The convergence analysis uses discrete reflection and truncation to reduce
+the quadratic problem to a globally Lipschitz system and combines reflected BSDE discretization estimates with neural network approximation errors. Numerical experiments for
+American options illustrate the effects of discount rate and entropic ambiguity on stopping
+values and exercise decisions.
+1
+Introduction
+Dynamic risk measures have become a fundamental tool for the quantitative assessment of
+financial positions under uncertainty (see, among many others, [1, 9, 17, 7, 2, 4, 11]). Unlike
+classical conditional expectations, dynamic risk measures allow nonlinear preferences, model
+uncertainty, recursive evaluation and time-consistent risk assessment. Following the pioneering
+works on BSDEs and g-expectations [14, 24, 8, 5], it is now well understood that a large
+class of dynamic risk measures admits a representation through backward stochastic differential
+equations (BSDEs), where the generator completely characterizes the underlying notion of risk,
+ambiguity and investor preferences. This connection has subsequently been developed in the
+context of nonlinear pricing, coherent and convex risk measures, and utility valuation [15, 26,
+2, 10].
+Among the various classes of dynamic risk measures, cash-subadditive risk measures have
+attracted considerable attention because they naturally incorporate ambiguity in discounting
+and interest rates. Unlike the classical cash-additive framework, they allow uncertainty in the
+time value of money and therefore provide a more flexible approach to long term financial
+valuation. Their BSDE characterization and dual representation were established by El Karoui
+and Ravanelli [16], who showed that discount rate ambiguity induces a nonlinear dependence
+1Department of Mathematics, KTH Royal Institute of Technology and Digital Futures, 100 44, Stockholm,
+Sweden. Email: nacira@kth.se. Work supported by the Swedish Research Council grant (2020-04697).
+2Department of Mathematics, University of Ljubljana, Ljubljana, Slovenia. Email: jan.rems@fmf.uni-lj.si.
+Work supported by Slovenian Research and Innovation Agency, research core funding No.P1-0448.
+3Department of Statistics and Quantitative Methods, University of Milano-Bicocca, Milano, Italy. Email:
+emanuela.rosazza1@unimib.it.
+Member of GNAMPA, INdAM, Italy.
+Work supported by Gnampa Research
+Project 2024 (PRR-20231026-073916-203).
+1
+arXiv:2609.23768v1  [q-fin.RM]  20 Sep 2026
+
+of the driver on the value process. See also, e.g., [12, 23] for a discussion on cash-subadditive
+risk measures.
+Optimal stopping under dynamic risk measures extends the classical theory of optimal stopping by replacing conditional expectations with nonlinear dynamic risk evaluations. Such problems arise naturally in the valuation of American derivatives under model uncertainty, optimal
+liquidation, insurance contracts, real options, and investment timing problems. In the Brownian
+framework, Bayraktar, Karatzas and Yao [3] studied optimal stopping for convex dynamic risk
+measures, while Quenez and Sulem [25] established a reflected BSDE representation for robust
+optimal stopping under dynamic risk measures with jumps, thereby extending the nonlinear
+Snell envelope approach initiated by El Karoui et al. [13].
+The objective of the present paper is to develop a unified framework for optimal stopping under paired ambiguity, where uncertainty simultaneously affects the probabilistic model
+and the discount mechanism.
+The first source of ambiguity is represented through changes
+of probability measure via Girsanov transformations, while the second corresponds to uncertainty in stochastic discounting, following the cash-subadditive framework of [16]. Combining
+these two mechanisms leads to a new family of dynamic risk measures (called paired-ambiguity
+dynamic risk measures) that naturally generalizes both classical entropic risk measures and
+cash-subadditive risk measures.
+Our first contribution is to formulate the corresponding optimal stopping problem and to
+characterize its value process by means of an upper reflected BSDE. The upper obstacle naturally
+appears because the problem is formulated in terms of liabilities, so that immediate stopping
+corresponds to the negative of the payoff process. We establish a reflected BSDE representation
+theorem and show that the optimal stopping strategy is given by the first hitting time of the
+reflected solution against the obstacle.
+Our second contribution concerns the structural properties of the resulting stopping operator. We prove that it inherits the principal axioms of dynamic risk measures and investigate its geometric properties, including monotonicity, cash-subadditivity, cash-additivity, quasiconcavity, concavity under affine drivers, and the failure of convexity in general. These results
+indicate that the stopping operator should be viewed as a dynamic risk measure acting on
+adapted stochastic processes rather than merely on terminal random variables.
+Special attention is devoted to quadratic drivers associated with entropic risk measures.
+Quadratic BSDEs play a central role in mathematical finance through their connection with
+exponential utility, entropic risk measures and robust valuation [21, 2, 12]. We revisit this framework in the reflected setting and derive the corresponding representation of entropic stopping
+risk measures. In particular, we obtain explicit stopping rules in several tractable situations
+and illustrate how discount ambiguity and model ambiguity interact within the reflected BSDE
+framework.
+The existence and uniqueness of reflected quadratic BSDEs rely on the theory
+developed by Kobylanski et al. [22].
+Finally, we propose a deep learning approximation scheme for solving the resulting reflected
+BSDEs. Since the drivers considered in this paper may exhibit quadratic growth in the control
+variable, standard convergence results for Lipschitz BSDEs are no longer directly applicable.
+Deep schemes for reflected BSDEs with Lipschitz drivers have been developed both by hard
+projection [19] and by regularization [18]; for quadratic drivers without reflection the truncation
+analysis of [6] is available, and the reflected quadratic case has been treated in [27] for a scheme
+in which the conditional expectations are computed exactly.
+We combine the last two, the
+truncation being made exact by the uniform bound on the integrand of the discretely reflected
+equation, and obtain a convergence estimate in which the network approximation errors appear
+explicitly. Numerical experiments for American options demonstrate the practical performance
+of the method and illustrate the impact of ambiguity on optimal stopping decisions.
+The paper is organized as follows. Section 2 introduces the paired-ambiguity dynamic risk
+measure and its dual representation. Section 3 formulates the optimal stopping problem and
+2
+
+derives the reflected BSDE characterization together with the main properties of the stopping
+operator. Section 4 is devoted to the entropic case and explicit stopping representations. Section
+5 develops the deep learning approximation scheme and establishes its convergence. Section
+6 presents financially meaningful examples of dynamic risk measures generated by reflected
+BSDEs. Finally, Section 7 reports numerical experiments illustrating the theoretical results.
+2
+Paired-Ambiguity Risk Measures and Reflected BSDE Representation
+In this section we formulate the optimal stopping problem associated with the paired-ambiguity
+dynamic risk measure introduced here below and derive its reflected BSDE representation. The
+framework combines two different sources of uncertainty. The first corresponds to ambiguity
+in the underlying probabilistic model and is represented through Girsanov changes of measure.
+The second corresponds to ambiguity in stochastic discounting, leading to a cash-subadditive
+dynamic evaluation. As a consequence, the resulting stopping problem extends the classical
+nonlinear optimal stopping framework to a setting where both model uncertainty and discount
+rate uncertainty are treated simultaneously.
+The formulation is inspired by the optimal stopping problem for convex dynamic risk measures studied by Bayraktar, Karatzas and Yao [3], while incorporating the cash-subadditive
+dual representation introduced by El Karoui and Ravanelli [16]. The combination of these two
+ingredients leads naturally to an upper reflected BSDE, which characterizes both the stopping
+value and the optimal exercise strategy.
+2.1
+Paired-ambiguity optimal stopping problem
+Consider a bounded adapted payoff process
+ξ = (ξt)0≤t≤T .
+For every stopping time τ ∈Tt, the paired-ambiguity dynamic risk measure is defined by
+ρt,τ(ξτ) =
+sup
+(α,β)∈A
+EQα 
+e−
+R τ
+t βs ds(−ξτ) −
+Z τ
+t
+e−
+R s
+t βu dug∗(s, αs, βs) ds
+ Ft
+
+,
+(1)
+where the process α models ambiguity in the probability measure through Girsanov transformations, β represents ambiguity in stochastic discounting, and A is a given set over which there
+is paired-ambiguity. The function g∗denotes the convex conjugate of the BSDE driver g.
+The corresponding optimal stopping problem is
+Vt = ess inf
+τ∈Tt ρt,τ(ξτ).
+(2)
+Unlike the classical cash-additive framework, the evaluation (1) simultaneously accounts
+for uncertainty in the probabilistic model and in the discount mechanism. Consequently, the
+stopping value incorporates both model ambiguity and interest rate ambiguity within a unified
+dynamic risk measure framework. Note that (1) corresponds to the dual representation of El
+Karoui and Ravanelli [16] for A as in (7). Here, instead, A is considered general.
+The representation of the value process follows the same general philosophy as nonlinear
+Snell envelopes generated by BSDEs. However, the presence of the discount process modifies
+the dual representation and changes the associated BSDE driver. The reflected BSDE obtained
+below therefore extends the standard representation by incorporating both sources of ambiguity
+into a single nonlinear evaluation.
+3
+
+2.2
+Standing assumptions
+We work on a complete filtered probability space (Ω, F, (Ft)0≤t≤T , P) satisfying the usual conditions and carrying a d-dimensional Brownian motion W. For t ∈[0, T], let Tt denote the set
+of (Fs)-stopping times with values in [t, T]. We use the standard spaces
+S2 =
+(
+Y : Y is adapted and continuous, E
+"
+sup
+0≤t≤T
+|Yt|2
+#
+< ∞
+)
+and
+H2 =
+
+Z : Z is progressively measurable and E
+Z T
+0
+|Zt|2 dt
+
+< ∞
+
+.
+Let ξ = (ξt)t∈[0,T] be an adapted bounded continuous process with ξ ∈S2. The process ξ
+represents the financial payoff received upon stopping, so the upper obstacle for the risk process
+is −ξ and the terminal condition is compatible with the obstacle, namely YT = −ξT . Let
+g : Ω× [0, T] × R × Rd →R
+be a progressively measurable driver. We assume the following:
+• g(t, ·, ·) is continuous with linear-quadratic growth, i.e. there exists a constant C > 0 such
+that for any y ∈R, z ∈Rd
+|g(t, y, z)| ≤|g(t, 0, 0)| + C|y| + C|z|2,
+g(·, 0, 0) ∈H2.
+• For any M > 0 there exists C > 0 such that for any y ∈[−M, M], z ∈Rd
+|∂g
+∂z (t, y, z)| ≤C(1 + |z|).
+• For any ϵ > 0 there exists Cϵ > 0 such that for any y ∈R, z ∈Rd
+∂g
+∂y(t, y, z) ≤Cϵ + ϵ|z|2.
+Note that the last assumption is automatically satisfied if g is differentiable and decreasing in
+y.
+The assumptions guarantee that the fixed horizon BSDEs and the upper reflected BSDE
+below have a unique solution and the Comparison Theorem holds for both the BSDEs and the
+reflected BSDEs. See Theorems 2.3 and 2.6 of Kobylanski [21] for BSDEs and Corollary 1 and
+Proposition 3.2 of Kobylanski et al. [22] for reflected BSDEs. Consider a BSDE with driver g
+of the form
+Yt = −ξT +
+Z T
+t
+g(s, Ys, Zs) ds −
+Z T
+t
+Zs dWs.
+0 ≤t ≤T,
+(3)
+We recall the following definition of (upper) reflected BSDEs. See [13, 22] and the references
+therein.
+Definition 2.1 (Upper reflected BSDE). Let L = (Lt)0≤t≤T be an adapted obstacle process
+and let η be an FT -measurable terminal condition satisfying
+η ≤LT .
+A triple (Y, Z, K) is called a solution of the upper reflected BSDE with generator g, terminal
+condition η, and upper obstacle L if
+Yt = η +
+Z T
+t
+g(s, Ys, Zs) ds −
+Z T
+t
+Zs dWs −(KT −Kt),
+0 ≤t ≤T,
+(4)
+4
+
+where K is an adapted nondecreasing process with K0 = 0, such that
+Yt ≤Lt,
+0 ≤t ≤T,
+(5)
+and
+Z T
+0
+(Yt −Lt) dKt = 0.
+(6)
+The last condition is the Skorokhod minimality condition; equivalently, K can increase only on
+the contact set
+{t ∈[0, T] : Yt = Lt}.
+3
+Optimal stopping problem for risk measures and obstacle
+Let g∗denote the convex conjugate associated with the dual variables corresponding to model
+and discount ambiguity. Following the dual representation of cash-subadditive risk measures
+[16], we consider admissible pairs (α, β) in the class
+A = {(α, β) : α ∈BMO,
+0 ≤βt ≤C,
+g∗(t, αt, βt) < +∞} .
+(7)
+For each admissible α, the stochastic exponential
+E
+
+−
+Z ·
+0
+αs dWs
+
+T
+= exp
+
+−
+Z T
+0
+αs dWs −1
+2
+Z T
+0
+|αs|2 ds
+
+is assumed to be a uniformly integrable martingale and defines an equivalent probability measure
+Qα by
+dQα
+dP = E
+
+−
+Z ·
+0
+αs dWs
+
+T
+.
+The process β represents ambiguity in the stochastic discount rate. We also assume that the
+discounted penalty term is integrable for every (α, β) ∈A, and that A is stable under stopping and pasting: if two admissible pairs are used before and after a stopping time, then the
+pasted pair is again admissible. Finally, the dual representation below is assumed to be time
+consistent, equivalently generated by the BSDE driver in (3). These stability and time consistency conditions are the hypotheses needed for the nonlinear Snell envelope and reflected BSDE
+arguments.
+For t ≤τ, the paired-ambiguity risk evaluation is
+ρt,τ(ξτ) =
+sup
+(α,β)∈A
+EQα 
+e−
+R τ
+t βs ds(−ξτ) −
+Z τ
+t
+e−
+R s
+t βu dug∗(s, αs, βs) ds
+ Ft
+
+,
+(8)
+where
+g∗(s, α, β) =
+sup
+(y,z)∈R×Rd{−βy −α · z −g(s, y, z)}.
+(9)
+See Theorem 7.5 of [16].
+Under the standing assumptions, we now focus on the following optimal stopping problem
+φt(ξ) := ess inf
+τ∈Tt ρt,τ(ξτ).
+(10)
+The following result is the upper obstacle, risk measure counterpart of Proposition 3.1 in
+[22].
+After the corresponding sign transformation, the essential supremum characterization
+therein becomes the essential infimum characterization below.
+5
+
+Theorem 3.1 (Reflected BSDE representation). Under the standing assumptions 2.2, the value
+process (φt(ξ))t in (10) is the first component of the unique upper reflected BSDE (4)–(6), with
+η = −ξT ,
+Lt = −ξt.
+In particular,
+φt(ξ) = Yt.
+Moreover, under the regularity assumptions ensuring attainment of the optimal stopping
+problem, the first contact time
+τ ∗
+t = inf{s ≥t : Ys = −ξs}
+is optimal.
+Note that the stopping payoff is received as a financial payoff ξt, while the risk process is
+written with the sign convention of a liability. Hence the immediate stopping risk is −ξt, and
+the reflected BSDE has the upper obstacle (−ξt).
+In the following result, we prove the properties satisfied by the optimal stopping value φ.
+For mt ∈L∞(Ft), we use the notation ξ + mt for the shifted payoff process defined on [t, T]
+by
+(ξ + mt)s := ξs + mt,
+s ∈[t, T].
+Theorem 3.2 (Dynamic risk measure properties and geometry of the stopping operator). The
+stopping operator φ defined in (10) inherits the main axioms of dynamic risk measure. More
+precisely, it satisfies the following properties.
+a) (decreasing monotonicity) For any t ∈[0, T], φt is monotone decreasing, i.e., if ξs ≥ηs for
+any s ∈[0, T] (with η being a bounded adapted obstacle), then φt(ξ) ≤φt(η).
+b) (cash-subadditivity) If g is decreasing in y, then φt is cash-subadditive for any t ∈[0, T], i.e.,
+φt(ξ + mt) ≥φt(ξ) −mt for any obstacle ξ and mt ∈L∞
++ (Ft).
+c) (cash-additivity) If g is independent of y, then φt is cash-additive for any t ∈[0, T], i.e.,
+φt(ξ + mt) = φt(ξ) −mt for any obstacle ξ and mt ∈L∞(Ft).
+d) (quasi-concavity) Assume that any ρt,τ satisfies the following continuity property:
+ρt,τ(ess sup{X; Y }) = ess inf{ρt,τ(X); ρt,τ(Y )}.
+If φt(ξ) ≥ct and φt(η) ≥ct for bounded obstacles ξ, η and for some t ∈[0, T] and ct ∈
+L∞(Ft), then φt(λξ + (1 −λ)η) ≥ct for any λ ∈[0, 1].
+e) If g is affine in y, z, i.e. g(t, y, z) = ay + b · z + c for some a, c ∈R and b ∈Rd, then φt is
+concave for any t ∈[0, T], i.e., φt(λξ + (1 −λ)η) ≥λφt(ξ) + (1 −λ)φt(η) for all obstacles ξ, η
+and λ ∈[0, 1].
+f) φt is not convex in general. For instance, convexity fails when g(t, y, 0) = 0 for any y ∈R
+or when g is independent of y and g(t, 0) = 0.
+The previous result highlights that convexity of φ fails in general and that the sufficient
+conditions (e.g., the continuity assumption in d) and the assumption on g in e)) for φ to be
+(quasi-)concave are quite strong.
+Proof. a) Let ξ, η be adapted and bounded obstacles with ξs ≥ηs for any s ∈[0, T].
+By the properties of BSDEs and of the associated risk measures (see, e.g., [2], [14], [26]),
+ρg
+t,τ(ξτ) ≤ρg
+t,τ(ητ) for any t ≤τ. It then follows that φt(ξ) ≤φt(η) for all t ∈[0, T].
+6
+
+b) By El Karoui and Ravanelli [16], decreasing monotonicity of g in y implies cash-subadditivity
+of any ρt,τ. It then follows that for any obstacle ξ and any mt ∈L∞
++ (Ft)
+φt(ξ + mt) = ess inf
+τ∈Tt ρt,τ(ξ + mt)
+≥ess inf
+τ∈Tt {ρt,τ(ξ) −mt}
+= φt(ξ) −mt.
+c) By Briand et al. [5], independence of g in y implies cash-additivity of any ρt,τ. The thesis
+then follows by proceeding as in item b).
+d) Clearly, φt(ξ) ≥ct implies that ρt,τ(ξτ) ≥ct for any τ ∈Tt; similarly for φt(η).
+For any λ ∈[0, 1]
+φt(λξ + (1 −λ)η) = ess inf
+τ∈Tt ρt,τ(λξτ + (1 −λ)ητ)
+≥ess inf
+τ∈Tt ρt,τ(ess sup{ξτ; ητ})
+= ess inf
+τ∈Tt ess inf{ρt,τ(ξτ); ρt,τ(ητ)}
+(11)
+≥ct,
+where (11) is due to the continuity assumption of ρt,τ.
+e) If g is affine, then the associated ρt,s is both convex and concave (see, e.g., [2], [14], [26]). It
+then follows that, for any λ ∈[0, 1] and all obstacles ξ, η,
+φt(λξ + (1 −λ)η) = ess inf
+τ∈Tt ρt,τ(λξτ + (1 −λ)ητ)
+≥ess inf
+τ∈Tt {λρt,τ(ξτ) + (1 −λ)ρt,τ(ητ)}
+≥λ ess inf
+τ∈Tt ρt,τ(ξτ) + (1 −λ) ess inf
+τ∈Tt ρt,τ(ητ)
+= λφt(ξ) + (1 −λ)φt(η).
+f) Assume that g(t, y, 0) = 0 for any y ∈R or that g is independent of y and g(t, 0) = 0. Then,
+by [24] (see also Prop. 2.1 of [8]), the associated ρt,s satisfies constancy, i.e. ρt,s(ct) = −ct for
+any ct ∈L∞(Ft).
+For deterministic obstacles ξ, η, then,
+φt(ξ) = ess inf
+τ∈Tt ρt,τ(ξτ) = ess inf
+s∈[t,T] ρt,s(ξs) = ess inf
+s∈[t,T] (−ξs),
+where the last equality is due to the constancy property. A similar expression holds for φt(η).
+Let t ∈[0, T) and take ξs = s, ηs = −2s for any s ∈[t, T] and λ = 1
+2. It then follows
+immediately that
+φt(ξ) = ess inf
+s∈[t,T] (−ξs) = −T;
+φt(η) = ess inf
+s∈[t,T] (−ηs) = 2t
+and
+φt(λξ + (1 −λ)η) = ess inf
+s∈[t,T]
+
+−1
+2ξs −1
+2ηs
+
+= t
+2 > 1
+2φt(ξ) + 1
+2φt(η) = −T
+2 + t,
+where the strict inequality holds for any t < T. Convexity then fails in general.
+Note that the previous proof is based on the relation between optimal stopping problems,
+reflected BSDEs, and BSDEs.
+It is worth underlining that, by its definition and by its properties, φ can be seen more as
+a dynamic risk measure for processes than as one for random variables.
+7
+
+In the following, we will focus our attention on examples of drivers of the following form:
+g(t, y, z) =
+sup
+(δ,γ)∈C
+ψ(δ, γ, y, z),
+for a given set C that can be interpreted as the set over which there is paired-ambiguity and for
+ψ(δ, γ, y, z) convex in (y, z) and decreasing in y. Consequently, the associated driver g satisfies
+the same properties.
+Some special cases of drivers could be:
+• g(t, y, z) = sup(δ,γ)∈C{−δy+ γ
+2|z|2} with δ > 0 on C that can be seen as a paired-ambiguity
+on aversion in the entropic-type term and on discounting;
+• g(t, y, z) = supδ∈C{−δy} with δ > 0 on C (ambiguity on discounting);
+• g(t, y, z) = supγ∈C{γz} (ambiguity on the probability measure/generalized scenario Q
+over which expectation is taken);
+• g(t, y, z) = sup(δ,γ)∈C{−δy + γz} with δ > 0 on C (linear pair-ambiguity);
+• g(t, y, z) = supδ{−δy + ¯γz} with δ > 0 on C;
+• g(t, y, z) = supγ{γ
+2|z|2} (ambiguity on the aversion parameter in the entropic case).
+4
+Entropic Risk Measure
+The entropic case is the canonical reflected quadratic BSDE example for this stopping problem.
+It should be treated separately from the Lipschitz theory: existence, uniqueness and comparison
+rely on quadratic BSDE estimates, BMO martingales and exponential integrability conditions
+as in Kobylanski type results [21, 22]. In the reflected case, these conditions are combined with
+the upper obstacle estimates used in the Quenez–Sulem representation [25].
+4.1
+Properties of the entropic reflected quadratic BSDE
+In the stopping problem, the relevant object is not the fixed terminal entropic BSDE alone, but
+the upper reflected quadratic BSDE with obstacle −ξ:
+Yt = −ξT +
+Z T
+t
+γ
+2|Zs|2 ds −
+Z T
+t
+Zs dWs −(KT −Kt),
+0 ≤t ≤T,
+(12)
+with
+Yt ≤−ξt,
+Z T
+0
+(Yt + ξt) dKt = 0.
+(13)
+Here K is the reflection process. The ordinary entropic BSDE appears only as the local equation
+on an interval where no reflection occurs, or as the fixed stopping time evaluation used inside
+the nonlinear Snell envelope.
+4.2
+Explicit entropic representation and reflected envelope
+We now exploit the exponential structure of the entropic driver to obtain a more explicit representation of the stopping problem. The exponential transformation converts the upper reflected
+quadratic BSDE into a classical lower Snell envelope problem for the transformed payoff e−γξ.
+This yields both an explicit representation of the value process and a direct characterization of
+the associated optimal stopping rule.
+8
+
+Proposition 4.1 (Exponential transform for the entropic reflected quadratic BSDE). Let γ > 0,
+and assume that the payoff process ξ is continuous and has sufficient exponential moments so
+that the quadratic reflected BSDE below is well posed in the sense of the quadratic reflected
+BSDE literature. Let g(z) = (γ/2)|z|2, and denote by Eg
+t,τ[η] the first component at time t of
+the BSDE on [t, τ] with driver g and terminal condition η. In the entropic case,
+Eg
+t,τ[−ξτ] = 1
+γ log E
+h
+e−γξτ | Ft
+i
+.
+(14)
+Then the value process
+Vt := ess inf
+τ∈Tt Eg
+t,τ[−ξτ]
+(15)
+is characterized by the upper reflected quadratic BSDE
+Vt = −ξT +
+Z T
+t
+γ
+2|Zs|2 ds −
+Z T
+t
+Zs dWs −(KT −Kt),
+(16)
+with obstacle and Skorokhod conditions
+Vt ≤−ξt,
+Z T
+0
+(Vt + ξt) dKt = 0.
+(17)
+Moreover, when the obstacle regularity ensures optimality of the first hitting time, an optimal
+stopping time is
+τ ∗
+t = inf{s ≥t : Vs = −ξs}.
+Equivalently, this BSDE nonlinear expectation value has the explicit reflected envelope representation
+Vt = ess inf
+τ∈Tt Eg
+t,τ[−ξτ] = 1
+γ log
+
+ess inf
+τ∈Tt E
+h
+e−γξτ | Ft
+i
+.
+(18)
+Proof. We first recall the non-reflected entropic calculation, since it is the basic exponential
+transform behind the reflected formula. Fix a stopping time τ ∈Tt and a terminal payoff ξτ
+with the required exponential integrability. The quadratic BSDE on [t, τ] with terminal value
+−ξτ is
+Y τ
+s = −ξτ +
+Z τ
+s
+γ
+2|Zτ
+r |2 dr −
+Z τ
+s
+Zτ
+r dWr,
+t ≤s ≤τ.
+(19)
+Set Mτ
+s := exp(γY τ
+s ). By Itˆo’s formula,
+dMτ
+s = γMτ
+s dY τ
+s + γ2
+2 Mτ
+s |Zτ
+s |2 ds
+= γMτ
+s
+
+−γ
+2|Zτ
+s |2 ds + Zτ
+s dWs
+
++ γ2
+2 Mτ
+s |Zτ
+s |2 ds
+= γMτ
+s Zτ
+s dWs.
+Thus Mτ is a martingale under the stated exponential moment assumptions, and its terminal
+value is Mτ
+τ = e−γξτ . Consequently
+Y τ
+t = 1
+γ log E
+h
+e−γξτ | Ft
+i
+= Eg
+t,τ[−ξτ].
+(20)
+Taking the essential infimum over all admissible stopping times gives
+Vt = ess inf
+τ∈Tt Y τ
+t = ess inf
+τ∈Tt Eg
+t,τ[−ξτ] = ess inf
+τ∈Tt
+1
+γ log E
+h
+e−γξτ | Ft
+i
+.
+9
+
+Since x 7→(1/γ) log x is increasing, this is equivalent to (18). If
+Rt := ess inf
+τ∈Tt E
+h
+e−γξτ | Ft
+i
+,
+then R is the lower Snell envelope of the transformed payoff e−γξ. In particular, Rt ≤e−γξt,
+and applying the increasing map (1/γ) log(·) gives the upper obstacle condition Vt ≤−ξt.
+We now identify explicitly how the reflection term transforms under the exponential change
+of variables. Since
+Rt = eγVt,
+and the reflected quadratic BSDE can be written in differential form as
+dVt = −γ
+2|Zt|2 dt + Zt dWt + dKt,
+Itˆo’s formula gives
+dRt = γRt dVt + γ2
+2 Rt|Zt|2 dt
+= γRt
+
+−γ
+2|Zt|2 dt + Zt dWt + dKt
+
++ γ2
+2 Rt|Zt|2 dt
+= γRtZt dWt + γRt dKt.
+Thus, setting
+eZt := γRtZt
+and
+At :=
+Z t
+0
+γRs dKs,
+we obtain
+dRt = eZt dWt + dAt.
+Since K is nondecreasing and Rt > 0, the process A is also nondecreasing.
+Moreover, the upper obstacle condition Vt ≤−ξt is equivalent, under the increasing exponential transformation, to
+Rt ≤e−γξt.
+The Skorokhod condition is preserved by the transformation. Indeed, dKt is carried by the
+contact set
+{Vt = −ξt},
+and therefore dAt = γRt dKt is carried by
+{Rt = e−γξt}.
+Consequently,
+Z T
+0
+ Rt −e−γξt
+dAt = 0.
+Hence R is precisely the lower Snell envelope of the transformed payoff e−γξ, with Doob–Meyer
+decomposition
+dRt = eZt dWt + dAt.
+Conversely, starting from the lower Snell envelope R, define
+Vt := 1
+γ log Rt,
+Zt :=
+eZt
+γRt
+,
+Kt :=
+Z t
+0
+1
+γRs
+dAs.
+10
+
+Applying Itˆo’s formula to Vt = (1/γ) log Rt yields
+dVt = −γ
+2|Zt|2 dt + Zt dWt + dKt.
+Together with
+Vt ≤−ξt,
+Z T
+0
+(Vt + ξt) dKt = 0,
+this recovers the upper reflected quadratic BSDE
+Vt = −ξT +
+Z T
+t
+γ
+2|Zs|2 ds −
+Z T
+t
+Zs dWs −(KT −Kt).
+Conversely, the comparison and minimality principle for reflected BSDEs identify the first component of any solution with the essential infimum of the entropic stopping evaluations. The
+first contact time τ ∗
+t = inf{s ≥t : Vs = −ξs} is optimal whenever the standard obstacle regularity assumptions ensure that this hitting time is admissible and the Snell envelope is attained
+there.
+The proposition above contains the detailed exponential transform proof. The key point
+is that reflection does not destroy the entropic transform; it changes the single conditional
+expectation in the non-reflected formula (20) into the lower Snell envelope appearing in (18).
+Thus the remaining object is classical: the optimal stopping envelope of the transformed payoff
+e−γξ.
+The proposition above reduces the entropic stopping problem to a classical optimal stopping
+problem for the positive transformed payoff
+Ut := e−γξt.
+In general, the lower Snell envelope of U is the explicit object; a closed formula requires additional structure on ξ. The following cases are useful benchmarks for checking a numerical
+solver.
+Proposition 4.2 (Explicit stopping solutions for entropic risk). Let
+Ut := e−γξt,
+Rt := ess inf
+τ∈Tt E[Uτ | Ft],
+Vt := 1
+γ log Rt.
+Then the following cases admit explicit optimal stopping rules.
+(i) If U is a submartingale, then
+Rt = Ut = e−γξt,
+Vt = −ξt,
+and immediate stopping
+τ ∗
+t = t
+is optimal.
+(ii) If U is a supermartingale, then
+Rt = E[UT | Ft] = E[e−γξT | Ft],
+and therefore
+Vt = 1
+γ log E[e−γξT | Ft].
+In this case terminal stopping
+τ ∗
+t = T
+is optimal.
+11
+
+(iii) If ξ = (ξs)0≤s≤T is deterministic and continuous, then
+Rt = min
+s∈[t,T] e−γξs = e−γ maxs∈[t,T ] ξs,
+and hence
+Vt = −max
+s∈[t,T] ξs.
+An optimal stopping time is the first future maximizer
+τ ∗
+t = inf
+
+s ∈[t, T] : ξs = max
+u∈[t,T] ξu
+
+.
+(iv) Suppose that
+ξt = x0 + µt + σWt,
+σ̸ = 0.
+Then
+Ut = e−γx0 exp
+ −γµt −γσWt
+
+,
+and
+dUt = Ut
+
+−γµ + γ2σ2
+2
+
+dt −γσ dWt
+
+.
+Consequently, if
+µ < γσ2
+2 ,
+then U is a submartingale, immediate stopping is optimal, and
+Rt = e−γξt,
+Vt = −ξt.
+If
+µ > γσ2
+2 ,
+then U is a supermartingale, terminal stopping is optimal, and
+Rt = exp
+
+−γξt +
+
+−γµ + γ2σ2
+2
+
+(T −t)
+
+,
+so that
+Vt = −ξt +
+
+−µ + γσ2
+2
+
+(T −t).
+At the critical value
+µ = γσ2
+2 ,
+the process U is a martingale. Hence every stopping time τ ∈Tt gives the same value,
+Rt = Ut,
+Vt = −ξt.
+Proof. For (i), if U is a submartingale, then for every τ ∈Tt, the optional sampling theorem
+gives
+E[Uτ | Ft] ≥Ut.
+Since τ = t is admissible,
+Rt = ess inf
+τ∈Tt E[Uτ | Ft] = Ut.
+12
+
+Therefore
+Vt = 1
+γ log Ut = −ξt,
+and immediate stopping is optimal.
+For (ii), if U is a supermartingale, then for every τ ∈Tt,
+E[UT | Fτ] ≤Uτ.
+Taking conditional expectations with respect to Ft yields
+E[UT | Ft] ≤E[Uτ | Ft].
+Since τ = T is admissible,
+Rt = E[UT | Ft],
+which gives the stated formula for Vt.
+For (iii), since ξ is deterministic,
+Rt = min
+s∈[t,T] e−γξs.
+Because x 7→e−γx is decreasing,
+min
+s∈[t,T] e−γξs = e−γ maxs∈[t,T ] ξs.
+Continuity of ξ ensures that the maximum is attained, and therefore the first maximizer is an
+optimal stopping time.
+Finally, for (iv), Itˆo’s formula applied to Ut = e−γξt gives
+dUt = Ut
+
+−γµ + γ2σ2
+2
+
+dt −γσ dWt
+
+.
+Thus U is a submartingale when
+µ < γσ2
+2 ,
+a supermartingale when
+µ > γσ2
+2 ,
+and a martingale at equality. The corresponding optimal stopping rules follow from (i) and (ii).
+In the supermartingale case, conditioning on the Brownian increment WT −Wt gives
+E[e−γξT | Ft] = exp
+
+−γξt +
+
+−γµ + γ2σ2
+2
+
+(T −t)
+
+,
+and applying (1/γ) log(·) yields
+Vt = −ξt +
+
+−µ + γσ2
+2
+
+(T −t).
+Remark 4.3 (Two Brownian benchmark examples). Proposition 4.2(iv) yields two particularly
+simple benchmark examples.
+First, consider
+ξt = aWt −γa2
+2 t + ct,
+c > 0.
+13
+
+Here
+µ = c −γa2
+2 ,
+σ = a.
+Hence Ut = e−γξt is a supermartingale precisely when
+c ≥γa2.
+If c > γa2, terminal stopping is optimal and
+Vt = −aWt + γa2T −γa2
+2 t −cT.
+At the critical value c = γa2, U is a martingale, so every stopping time in Tt is optimal and
+Vt = −ξt.
+Second, consider
+ξt = aWt −γa2
+2 t −ct,
+c > 0.
+In this case
+µ = −c −γa2
+2
+< γa2
+2 ,
+so U is a submartingale. Consequently, immediate stopping is optimal,
+τ ∗
+t = t,
+and
+Vt = −ξt.
+5
+Algorithm and its Convergence
+In this section we establish convergence of a deep learning scheme for the reflected BSDE of
+Section 2.2.
+Two obstructions have to be removed.
+The driver is quadratic in z, whereas
+the available error estimates for backward schemes require a globally Lipschitz driver; and the
+martingale integrand Z of a continuously reflected quadratic BSDE need not be bounded, so the
+driver cannot simply be truncated without changing the solution. Both are handled by passing
+through the discretely reflected equation, following [27], on which the integrand is uniformly
+bounded and the truncation is therefore exact. The resulting Lipschitz system is then treated
+by the reflected deep backward scheme of [19].
+5.1
+Markovian setting
+Throughout this section we work in a Markovian framework, which is more restrictive than that
+of Section 2.2. Let X solve
+Xt = x0 +
+Z t
+0
+b(s, Xs) ds +
+Z t
+0
+σ(s) dWs,
+t ∈[0, T],
+(21)
+let the obstacle be ξt = h(Xt) for a deterministic h, and let the driver be g(t, x, y, z). The upper
+reflected BSDE (4) then reads
+
+
+
+
+
+
+
+
+
+
+
+Yt = −h(XT ) +
+Z T
+t
+g(s, Xs, Ys, Zs) ds −
+Z T
+t
+Zs dWs −(KT −Kt),
+Yt ≤−h(Xt),
+Z T
+0
+ Yt + h(Xt)
+
+dKt = 0,
+K continuous nondecreasing,
+K0 = 0.
+(22)
+14
+
+(H1) Forward process. b and σ are deterministic, σ does not depend on x, and for some L > 0
+|b(t, 0)| + |σ(t)| ≤L,
+|b(t, x) −b(t, x′)| ≤L|x −x′|.
+(H2) Obstacle. h : Rd →R satisfies |h(x)| ≤Mh and |h(x) −h(x′)| ≤L|x −x′|. No sign
+condition is imposed.
+(H3) Driver. g : [0, T] × Rd × R × Rd →R is continuous and, for constants Mg, γ, L > 0,
+|g(t, x, y, z)| ≤Mg(1 + |y|) + γ
+2|z|2,
+(23)
+|g(t, x, y, z) −g(t, x′, y, z)| ≤L
+ 1 + |z|
+
+|x −x′|,
+(24)
+|g(t, x, y, z) −g(t, x, y′, z)| ≤L|y −y′|,
+(25)
+|g(t, x, y, z) −g(t, x, y, z′)| ≤L
+ 1 + |z| + |z′|
+
+|z −z′|.
+(26)
+(H4) Time regularity. For s ≤t,
+|b(t, x) −b(s, x)| + |σ(t) −σ(s)| + |g(t, x, y, z) −g(s, x, y, z)| ≤L(t −s)1/2.
+Two further conditions are used only to quantify the discretisation error:
+(R1) h ∈C1
+b with L-Lipschitz derivative.
+(R2) h ∈C2
+b with L-Lipschitz first and second derivatives, and σ is L-Lipschitz in t.
+Remark 5.1. Relative to Section 2.2, (26) is the integrated form of the hypothesis |∂zg| ≤
+C(1 + |z|) imposed there and requires no differentiability; (23) strengthens the linear-quadratic
+growth bound by requiring the y-independent part to be bounded rather than merely in H2.
+The genuine restriction is Markovianity, which is unavoidable: the networks below take Xti as
+input, so the scheme can only represent Yt = u(t, Xt). That the drivers of Section 6 satisfy
+(H3)–(H4) is verified in Remark 7.1.
+It is convenient to record the reversal
+bY := −Y,
+bZ := −Z,
+bK := K,
+f(t, x, y, z) := −g(t, x, −y, −z),
+(27)
+under which (22) becomes the lower reflected equation
+bYt = h(XT ) +
+Z T
+t
+f(s, Xs, bYs, bZs) ds −
+Z T
+t
+bZs dWs + ( bKT −bKt),
+bYt ≥h(Xt),
+with bK nondecreasing. Since |f(t, x, y, z)| = |g(t, x, −y, −z)| and the moduli in (H3) are invariant under (y, z) 7→(−y, −z), f satisfies (H3)–(H4) with the same constants. The results of [27]
+and [19] are stated for the lower reflected equation and are quoted below for f; all statements
+transfer to (22) through (27).
+5.2
+Discrete reflection and a priori bounds
+Given a grid π = {0 = t0 < · · · < tN = T} with |π| = maxi(ti+1 −ti) and N|π| ≤L, let Xπ
+denote the Euler scheme for (21), so that
+E
+h
+sup
+0≤t≤T
+|Xt −Xπ
+t |2pi
+≤C|π|p,
+p ≥1,
+(28)
+which is the classical strong convergence estimate for the Euler–Maruyama scheme under (H1);
+see for instance [20]. For a set of reflection dates R ⊆π let (Y R, ZR) denote the solution of the
+discretely reflected equation, in which reflection acts only at the dates of R and the equation
+is solved exactly in between, and let (Y R,e, ZR,e) denote the same object driven by Xπ rather
+than X. We write (Y e, Ze, Ke) for the solution of (22) driven by Xπ.
+15
+
+Lemma 5.2 ([27], Prop. 2.2 and Lem. 4.5). Under (H1)–(H3) there are constants M and Mz,
+depending only on L, Mg, Mh, γ and T, such that
+∥Y ∥∞≤M,
+∥Z · W∥2
+BMO ≤e4γM
+γ2
+
+1 + 2γMg(1 + M)T
+
+,
+(29)
+and, for every R ⊆π,
+|ZR
+t | ≤Mz,
+|ZR,e
+t
+| ≤Mz,
+0 ≤t ≤T.
+(30)
+Remark 5.3. The bound (30) holds for the discretely reflected integrand, uniformly in R, and
+not for Z itself: the integrand of a continuously reflected quadratic BSDE need not be bounded,
+and (29) gives only a BMO estimate. This is the reason for introducing (Y R, ZR) at all. The
+hypothesis that σ be deterministic in (H1) is what secures (30); the case of state-dependent σ
+is open, see [27].
+5.3
+Truncated driver and the scheme
+Let ΠR(x) = max(−R, min(x, R)) act componentwise and set
+gMz(t, x, y, z) := g
+ t, x, y, ΠMz(z)
+
+,
+(31)
+the truncation radius being fixed to the constant Mz of Lemma 5.2. Since |ΠMz(z)| ≤
+√
+d Mz,
+(24)–(26) give, for all (x, y, z) and (x′, y′, z′),
+gMz(t, x, y, z)−gMz(t, x′, y′, z′)
+ ≤L
+ 1+
+√
+d Mz
+
+|x−x′|+L|y−y′|+L
+ 1+2
+√
+d Mz
+
+|z−z′|, (32)
+so gMz is globally Lipschitz. By (30), ΠMz(ZR
+t ) = ZR
+t and ΠMz(ZR,e
+t
+) = ZR,e
+t
+, whence
+(Y R,Mz, ZR,Mz) = (Y R, ZR),
+(Y R,e,Mz, ZR,e,Mz) = (Y R,e, ZR,e) :
+(33)
+truncation changes nothing at the discretely reflected level.
+We now define the scheme, taking R = π. At each date two networks Ui(·; θ) and Zi(·; θ)
+approximate the value and the integrand.
+Algorithm 1 projects at every date, so it is discretely reflected with R = π, the case of (33).
+The estimates of [27] below hold for general R ⊆π; taking R = π replaces their |R| by |π| and
+their αi(κ) by αi(N).
+5.4
+Convergence
+Write ( ¯Y π, ¯Zπ) for the discrete-time scheme obtained from Algorithm 1 when the conditional
+expectations are computed exactly, and let
+ϵN,˜u
+i
+:= inf
+ξ E
+˜ui(Xπ
+ti) −Ui(Xπ
+ti; ξ)
+2,
+ϵN,˜z
+i
+:= inf
+η E
+˜zi(Xπ
+ti) −Zi(Xπ
+ti; η)
+2
+be the L2 approximation errors of the network classes for the conditional expectations ˜ui, ˜zi
+arising at step i. The total error is measured by
+E
+
+( bU, b
+Z), (Y, Z)
+
+:=
+max
+i=0,...,N−1 E
+Yti −bUi(Xπ
+ti)
+2 + E
+hN−1
+X
+i=0
+Z ti+1
+ti
+Zt −b
+Zi(Xπ
+ti)
+2dt
+i
+.
+(36)
+Proposition 5.4. Let (H1)–(H4) hold and let R = π. There is a constant C > 0, independent
+of π and of the network classes, such that
+E
+
+( bU, b
+Z), (Y, Z)
+
+≤C
+
+ε(π) +
+N−1
+X
+i=0
+ NϵN,˜u
+i
++ ϵN,˜z
+i
+
+,
+(37)
+16
+
+Algorithm 1 Reflected deep backward dynamic programming with upper obstacle
+Step 1. Input. Simulate the Euler paths (Xπ
+ti, ∆Wi)N−1
+i=0 ; the obstacle function h; the truncated
+driver gMz of (31); network classes Ui, Zi.
+Step 2. Terminal condition. Set bUN(Xπ
+tN ) = −h(Xπ
+tN ).
+Step 3. Backward regression. For i = N −1, . . . , 0, given bUi+1, minimise
+bLi(θ) := E
+h bUi+1(Xπ
+ti+1) −Ui(Xπ
+ti; θ)
+(34)
++ gMz ti, Xπ
+ti, Ui(Xπ
+ti; θ), Zi(Xπ
+ti; θ)
+
+∆ti −Zi(Xπ
+ti; θ)∆Wi
+2i
+,
+and let θ∗
+i be a minimiser.
+Step 4. Upper reflection. Set
+bUi(x) = min
+
+Ui(x; θ∗
+i ), −h(x)
+	
+,
+b
+Zi(x) = Zi(x; θ∗
+i ).
+(35)
+Step 5. Output. ( bUi, b
+Zi)N−1
+i=0
+and bY0 = bU0(x0).
+where ε(π) is the discretisation error. Under (R1), ε(π) = O(|π|1/2) for the Y -component and
+O(|π|1/2) for the Z-component of (36); under (R2) the Y -component improves to O(|π|), while
+the Z-component does not improve.
+Here these rates refer to the squared error quantities in (36). Equivalently, at the norm
+level, the corresponding rate for the Y -component is O(|π|1/4) under (R1) and O(|π|1/2) under
+(R2), while the H2 error for the Z-component is O(|π|1/4) under both assumptions.
+Proof. Throughout, constants depend only on the data of (H1)–(H4) and on Mz. By (33) the
+driver may be replaced by gMz in every discretely reflected object without altering it, and by
+(32) that driver is globally Lipschitz, so all estimates below are for the Lipschitz system. The
+estimates for the passage to discrete reflection and for the time discretisation are those of [27],
+and the estimate for the network error is that of [19]; both are restated here for completeness
+and are not original to this paper. What is established below is their combination.
+For the value component, introduce the discrete S2 norm
+∥U∥S2π :=
+
+max
+0≤i≤N−1 E|Uti|2
+1/2
+.
+Then
+∥Y −bU∥S2π ≤∥Y −Y R∥S2π + ∥Y R −¯Y π∥S2π + ∥¯Y π −bU∥S2π.
+The three terms are respectively the passage from continuous to discrete reflection, the time
+discretisation, and the replacement of the conditional expectations by networks. For the first,
+[27, Lem. 4.2] gives
+max
+j
+
+sup
+t∈[rj,rj+1]
+|Yt −Y R
+t |
+
+L2 ≤C|π|1/4,
+improving to C|π|1/2 under (R1). For the second, the system being Lipschitz, [27, Lem. 4.1]
+gives
+Y R −¯Y π
+L2 ≤C
+ α1(N)|π|1/2 + ϵ1(π)
+
+,
+(α1, ϵ1) =
+(
+(N1/4, |π|1/4)
+under (R1),
+(1, |π|1/2)
+under (R2).
+17
+
+Since N|π| ≤L,
+α1(N)|π|1/2 =
+(
+N1/4|π|1/2 ≤L1/4|π|1/4
+under (R1),
+|π|1/2
+under (R2),
+and the first two terms together are O(|π|1/4) under (R1) and O(|π|1/2) under (R2).
+For the martingale integrand the same route is unavailable, the corresponding estimate in
+[27, Lem. 4.1] carrying α2(N) = N1/2 rather than α1, so that α2(N)|π|1/2 = (N|π|)1/2 does
+not vanish. One passes instead through the family driven by Xπ. The stability estimate [27,
+Thm. 3.2] together with (28) gives
+Z −Ze2
+H2 ≤C
+X −Xπ ≤C|π|1/2,
+then ∥Ze −ZR,e∥H2 ≤C|π|1/4 by [27, Lem. 4.2], and finally the third estimate of [27, Lem. 4.1]
+gives
+ZR,e −¯Zπ
+H2 ≤C
+ α1(N)|π|1/2 + ϵ2(π)
+
+,
+ϵ2(π) = |π|1/4,
+with α1 as above. Each of these three terms is O(|π|1/4), and ϵ2 is unchanged by (R2), which is
+the assertion that the estimate for the integrand does not improve under the stronger regularity.
+It remains to bound the network error, the third term of the decomposition above. By (32)
+the system driven by gMz satisfies hypothesis (H1) of [19], and Algorithm 1 is their RDBDP
+scheme with min in place of max in the projection step (35). The argument of [19, proof of
+Thm. 4.4, from (4.41)] therefore applies verbatim, the only change being the use of
+min(a, c) −min(b, c)
+ ≤|a −b|,
+a, b, c ∈R,
+in place of the corresponding inequality for max. That argument uses only the Lipschitz property
+of the driver and the identity arg minθ bLi(θ) = arg minθ eLi(θ), and is insensitive to the law of
+the forward process, so X may be replaced by Xπ throughout. It yields
+max
+i=0,...,N−1 E
+ ¯Y π
+ti −bUi(Xπ
+ti)
+2 ≤C
+N−1
+X
+i=0
+ NϵN,˜u
+i
++ ϵN,˜z
+i
+
+,
+and the corresponding bound for the integrand by the argument of [19, proof of Thm. 4.1, Step
+5]. Combining the displays gives (37).
+Remark 5.5. The constant C in (37) depends on the Lipschitz constant of gMz, hence by (32) on
+Mz, which involves exponential terms in the data. The estimate is therefore qualitatively sharp
+but numerically weak. An alternative, developed for unreflected quadratic BSDEs in [6], is to
+let the truncation radius grow with the grid rather than fixing it, balancing a nonzero truncation
+error against a slowly growing Lipschitz constant and recovering a rate |π|1−η for every η > 0
+with a controlled constant. Extending that construction to the reflected deep backward scheme
+is left for future work, as is the case of state-dependent σ (Remark 5.3).
+Remark 5.6. The discretisation estimates are obtained in [27] for a scheme in which the conditional expectations are computed exactly, and the network error estimate in [19] for a Lipschitz
+driver. The contribution of this section is the combination of the two, the treatment of the
+upper obstacle, and the application to the drivers of Section 6.
+6
+Examples
+The purpose of this section is to illustrate how different specifications of the reflected BSDE
+driver correspond to different financial interpretations of ambiguity and risk evaluation. In the
+18
+
+reflected setting, the driver determines the nonlinear risk assessment during the continuation
+region, while the obstacle represents the immediate liquidation or exercise value. Thus each
+example below should be read as a particular financial mechanism generating a dynamic stopping
+risk measure.
+From a risk measure perspective, the variable Y represents the current risk adjusted value
+of the future position, whereas Z captures the exposure of this value to Brownian market
+uncertainty. A linear term in Y naturally corresponds to discounting, or equivalently to the
+time value of future cash flows. A quadratic term in Z corresponds to entropic model ambiguity,
+exponential utility valuation, or robustness with respect to changes of probability measure.
+The first example isolates ambiguity in the discount factor and is related to cash-subadditive
+risk measures. The second example recalls the classical discounted entropic driver. The third
+example combines both mechanisms by allowing uncertainty in the discount rate and in the
+entropic ambiguity parameter. Finally, the American put example shows how these drivers
+enter a reflected BSDE with an economically meaningful stopping boundary.
+6.1
+Bounded discount rate ambiguity
+Let the discount rate belong to the bounded interval
+βt ∈[β, β],
+0 ≤β ≤β.
+For t ≤τ, define
+ρt,τ(ξτ) :=
+sup
+β∈[β,β]
+E
+h
+e−
+R τ
+t βs ds(−ξτ)
+ Ft
+i
+.
+This is a pure discount-ambiguity risk measure.
+The probability measure is fixed, and the
+adversary only chooses the discount rate.
+The associated reflected BSDE driver is
+g(t, y, z) =
+sup
+β∈[β,β]
+{−βy}.
+For simplicity and to obtain an explicit benchmark, we take the ambiguity bounds β and β
+to be constant. More generally, one may consider bounded progressively measurable processes
+βt and βt, with 0 ≤βt ≤βt, without changing the basic supremum structure of the driver.
+Equivalently,
+g(t, y, z) = −βy 1{y<0} −βy 1{y≥0}.
+The stopping value
+Yt = ess inf
+τ∈Tt ρt,τ(ξτ)
+is represented by the upper reflected BSDE
+Yt = −ξT +
+Z T
+t
+sup
+β∈[β,β]
+{−βYs} ds −
+Z T
+t
+Zs dWs −(KT −Kt),
+with
+Yt ≤−ξt,
+Z T
+0
+(Yt + ξt) dKt = 0.
+The optimal stopping time is
+τ ∗
+t = inf{s ≥t : Ys = −ξs}.
+In the liability region, where Ys ≤0, the worst case discount rate is β. Hence the equation
+reduces locally to
+Yt = −ξT +
+Z T
+t
+(−βYs) ds −
+Z T
+t
+Zs dWs −(KT −Kt).
+19
+
+If the payoff process is deterministic, continuous, and nonnegative, then
+ρt,s(ξs) = −e−β(s−t)ξs,
+s ∈[t, T],
+and therefore
+Yt = −sup
+s∈[t,T]
+n
+e−β(s−t)ξs
+o
+.
+An optimal stopping time is any first maximizer of the discounted payoff:
+τ ∗
+t = inf
+(
+s ∈[t, T] : e−β(s−t)ξs = sup
+u∈[t,T]
+e−β(u−t)ξu
+)
+.
+6.2
+Linear discounting and change of measure
+We next consider an affine driver combining deterministic discounting with a linear change-ofmeasure component. Let
+g(t, y, z) = −βy + γ · z,
+β ≥0,
+γ ∈Rd.
+For simplicity, β and γ are taken to be constant in this benchmark. More generally, the same
+representation extends to suitable bounded progressively measurable processes βt and γt, provided the corresponding stochastic exponential is a true martingale.
+Since the driver is affine in (y, z), Theorem 3.2-(e) implies that the associated stopping
+operator φt is concave.
+To obtain an explicit representation of the corresponding dynamic risk evaluation, define
+the probability measure Qγ by
+dQγ
+dP
+
+Fs
+= E
+Z ·
+0
+γ · dWu
+
+s
+= exp
+Z s
+0
+γ · dWu −1
+2
+Z s
+0
+|γ|2 du
+
+.
+Since γ is constant, Novikov’s condition is automatically satisfied, and hence the stochastic
+exponential is a true martingale. By Girsanov’s theorem, the process
+W γ
+s := Ws −
+Z s
+0
+γ du = Ws −γs
+is a d-dimensional Brownian motion under Qγ.
+Indeed, for a fixed horizon s ∈[t, T], the BSDE associated with the dynamic risk evaluation
+is
+Yr = −ξs +
+Z s
+r
+ −βYu + γ · Zu
+
+du −
+Z s
+r
+Zu dWu,
+r ∈[t, s].
+In differential form,
+dYr = βYr dr −γ · Zr dr + Zr dWr.
+Since
+dWr = dW γ
+r + γ dr,
+the terms involving γ · Zr cancel, and therefore
+dYr = βYr dr + Zr dW γ
+r .
+Multiplying by the discount factor e−β(r−t) gives
+d
+
+e−β(r−t)Yr
+
+= e−β(r−t)Zr dW γ
+r .
+20
+
+Hence the discounted process is a Qγ-martingale. Using the terminal condition Ys = −ξs, we
+obtain
+ρt,s(ξs) = Yt = EQγ h
+e−β(s−t)(−ξs)
+ Ft
+i
+,
+ξs ∈L∞(Fs).
+Consequently, the corresponding optimal stopping risk functional admits the representation
+φt(ξ) = ess inf
+τ∈Tt ρt,τ(ξτ) = ess inf
+τ∈Tt EQγ h
+e−β(τ−t)(−ξτ)
+ Ft
+i
+.
+Thus, in this affine case, the nonlinear stopping problem reduces to a classical optimal stopping
+problem under the equivalent probability measure Qγ, with discount rate β.
+6.3
+Linear discounting with entropic model ambiguity
+A classical financially meaningful driver is
+g(t, y, z) = −δy + γ
+2|z|2,
+δ ≥0,
+γ > 0.
+The term −δy represents linear discounting, while (γ/2)|z|2 is the standard entropic or modelambiguity term.
+The convex conjugate is computed as
+g∗(t, β, α) =
+sup
+(y,z)∈R×Rd {−βy −α · z −g(t, y, z)} .
+Hence
+g∗(t, β, α) = sup
+y∈R
+{(−β + δ)y} + sup
+z∈Rd
+n
+−α · z −γ
+2|z|2o
+.
+The supremum in z is attained at
+z∗= −α
+γ ,
+and gives
+sup
+z∈Rd
+n
+−α · z −γ
+2|z|2o
+= 1
+2γ |α|2.
+Therefore
+g∗(t, β, α) =
+
+
+
+
+
+1
+2γ |α|2,
+β = δ,
++∞,
+β̸ = δ.
+Thus this model has entropic ambiguity in the probability measure, while the discount rate is
+fixed at δ. It serves as the benchmark case for the paired ambiguity model below.
+6.4
+Entropic model ambiguity with uncertain discounting
+We now allow simultaneous ambiguity in the discount rate and in the entropic ambiguity parameter. Let
+g(t, y, z) =
+sup
+(δ,γ)∈C
+n
+−δy + γ
+2|z|2o
+,
+where δ represents the discount rate and γ represents the strength of entropic model ambiguity.
+A separable ambiguity set is
+C = [δ, δ] × [γ, γ],
+with
+0 ≤δ ≤δ,
+0 < γ ≤γ.
+21
+
+In this case,
+g(t, y, z) = sup
+δ∈[δ,δ]
+(−δy) + sup
+γ∈[γ,γ]
+γ
+2|z|2.
+Therefore
+g(t, y, z) = −δy 1{y<0} −δy 1{y≥0} + γ
+2|z|2.
+In the liability region y ≤0, this reduces to
+g(t, y, z) = −δy + γ
+2|z|2.
+For simplicity, we take the ambiguity bounds δ, δ, γ, γ to be constant in this benchmark.
+More generally, one may consider bounded progressively measurable bounds
+δt ≤δt,
+γt ≤γt,
+leading to the time-dependent ambiguity set
+Ct = [δt, δt] × [γt, γt].
+The constant rectangular specification considered here is sufficient to illustrate explicitly the
+interaction between discount rate ambiguity and entropic model ambiguity.
+We deliberately use a rectangular ambiguity set, so that the two sources of ambiguity can
+vary independently. Indeed, the discount parameter δ and the entropic parameter γ play different roles in the driver: δ acts on the value variable y, whereas γ controls the quadratic exposure
+term |z|2. For this reason, no direct ordering between δ and γ is imposed.
+For fixed (y, z), the worst-case parameters can be identified explicitly. Since
+γ
+2|z|2
+is nondecreasing in γ, the supremum over the entropic ambiguity parameter is attained at
+γ∗= γ.
+Similarly,
+δ∗(y) =
+(
+δ,
+y < 0,
+δ,
+y ≥0.
+Hence, in the liability region y ≤0, the worst-case specification is
+(δ∗, γ∗) = (δ, γ),
+and the driver becomes
+g(t, y, z) = −δy + γ
+2|z|2.
+The associated stopping value
+Yt = ess inf
+τ∈Tt ρt,τ(ξτ)
+is represented by the upper reflected BSDE
+Yt = −ξT +
+Z T
+t
+sup
+(δ,γ)∈C
+n
+−δYs + γ
+2|Zs|2o
+ds −
+Z T
+t
+Zs dWs −(KT −Kt),
+with
+Yt ≤−ξt,
+Z T
+0
+(Yt + ξt) dKt = 0.
+22
+
+The optimal stopping time is
+τ ∗
+t = inf{s ≥t : Ys = −ξs}.
+If the payoff is deterministic and nonnegative, then Z ≡0. In the liability region, the driver
+becomes
+g(t, y, 0) = −δy.
+Consequently,
+ρt,s(ξs) = −e−δ(s−t)ξs,
+and the stopping value is explicitly
+Yt = −sup
+s∈[t,T]
+n
+e−δ(s−t)ξs
+o
+.
+Thus, in the deterministic case, the optimal stopping rule is to stop at the first time at which
+the worst case discounted payoff is maximal.
+6.5
+Geometric American put under entropic-discount ambiguity
+We consider an American put written on a single asset whose risk neutral price S follows a
+geometric Brownian motion. In log-price coordinates Xt = log St, the dynamics are
+dXt =
+
+r −1
+2σ2
+
+dt + σ dWt,
+X0 = log S0.
+The exercise payoff is
+ξt = (K −St)+ = (K −eXt)+.
+It is bounded by K and has continuous paths, hence it satisfies the standing obstacle assumptions.
+Using the entropic discount ambiguity driver
+g(t, y, z) =
+sup
+(δ,γ)∈C
+n
+−δy + γ
+2|z|2o
+,
+the stopping value
+Yt = ess inf
+τ∈Tt ρt,τ(ξτ)
+solves the upper reflected BSDE
+Yt = −ξT +
+Z T
+t
+g(s, Ys, Zs) ds −
+Z T
+t
+Zs dWs −(KT −Kt),
+Yt ≤−ξt,
+with
+Z T
+0
+(Yt + ξt) dKt = 0.
+For the separable ambiguity set
+C = [δ, δ] × [γ, γ],
+and in the liability region Yt ≤0, the driver reduces to
+g(t, Yt, Zt) = −δYt + γ
+2|Zt|2.
+Thus the reflected BSDE used for the American put becomes
+Yt = −ξT +
+Z T
+t
+
+−δYs + γ
+2|Zs|2
+
+ds −
+Z T
+t
+Zs dWs −(KT −Kt),
+Yt ≤−ξt.
+The initial asset level and strike may be chosen as S0 = 1 and K = 1.1. Then the option
+starts slightly in the money and the initial upper obstacle is
+−ξ0 = −(K −S0)+ = −0.1.
+This makes the stopping constraint active and visible in the numerical diagnostics.
+23
+
+7
+Numerical Diagnostics and Results
+We use the reflected deep backward dynamic programming scheme of Section 5, Algorithm 1,
+to solve the upper reflected BSDE (4)–(6) on three test cases:
+(1) American put under Black–Scholes (g(y) = −r y, no ambiguity), the standard optimal
+stopping benchmark for which a binomial reference price is available.
+(2) Bounded discount rate ambiguity of Section 6.1, a standard linear example under ambiguity
+that still falls within the Lipschitz framework.
+(3) Geometric American put under entropic discount ambiguity of Section 6.5, which introduces
+the superlinear (quadratic in z) driver and is the non-Lipschitz target of the convergence
+analysis in Section 5.
+Remark 7.1. The drivers of Section 6 satisfy (H3)–(H4). They are of the form
+g(t, x, y, z) =
+sup
+(δ,γ)∈C
+ψ(δ, γ, y, z),
+with C bounded, δ ∈[δ, δ] and γ ∈[γ, γ], and are independent of (t, x); hence (24) holds with
+L = 0 and (H4) is vacuous for g. For ψ(δ, γ, y, z) = −δy + γ
+2|z|2,
+−δ|y| ≤g(y, z) ≤δ|y| + γ
+2|z|2,
+giving (23) with Mg = δ and γ = γ, while | supa F(a, ·) −supa F(a, ·)| ≤supa |F(a, ·) −F(a, ·)|
+gives
+|g(y, z) −g(y′, z)| ≤sup
+δ
+δ|y −y′| ≤δ|y −y′|, |g(y, z) −g(y, z′)| ≤sup
+γ
+γ
+2
+|z|2 −|z′|2 ≤γ
+2
+ |z| + |z′|
+
+|z −z′|,
+which are (25) and (26). The remaining drivers of Section 6 are special cases. Boundedness of C is what
+these estimates require.
+Cases (1) and (3) use the payoff h(x) = (K −ex)+, which is bounded and Lipschitz but
+not differentiable at the strike. They therefore satisfy the standing assumptions (H1)–(H4) of
+Section 5, but not the additional regularity (R1)–(R2) under which the discretisation error in
+Proposition 5.4 is quantified. Case (2) satisfies all of them, and is the example for which the rate
+of Proposition 5.4 is available. For each case we report (i) sample paths of the value process Yt
+against the obstacle −ξt and of the control process Zt, (ii) the empirical distribution of optimal
+stopping times, and (iii) the training loss at the terminal time step. Numerical verification of
+the relevant properties of Theorem 3.2 is collected in Section 7.4.
+Common solver configuration.
+All experiments use the same network and training hyperparameters (Table 1). Outputs go through the upper-reflection projection (35). Implementation
+is in Python with PyTorch on CPU.
+Architecture
+3 hidden layers, 50 neurons per layer
+Activation
+tanh on hidden layers, identity on output
+Optimizer
+Adam, learning rate 10−3
+Batch size
+M = 210 = 1024
+Time discretization
+N = 50 steps, ∆t = T/N
+Base iterations per step
+itr = 300
+Iteration multiplier on last 3 steps
+×10
+Table 1: Network and training hyperparameters used in all three cases.
+24
+
+7.1
+American put under Black–Scholes
+This case is the canonical optimal stopping benchmark: the reflected BSDE of Theorem 3.1
+reduces, under the affine driver g(y) = −ry and the put payoff ξt = (K −St)+, to the classical
+American put under Black–Scholes. The Cox–Ross–Rubinstein binomial price is available as a
+reference, which fixes the baseline accuracy of the scheme before any ambiguity is introduced.
+The forward process is the GBM in log coordinates of Section 6.5; the upper obstacle is
+−ξt = −(K −eXt)+. The driver is recovered from Section 6 as the discount-only special case of
+Section 6.1 with β = β = r. Market parameters are listed in Table 2.
+Initial price
+S0
+1.0
+Strike
+K
+1.1
+Volatility
+σ
+0.2
+Risk-free rate
+r
+0.05
+Time horizon
+T
+1.0
+Table 2: Market parameters, American put under Black–Scholes.
+The Cox–Ross–Rubinstein binomial price with N = 2000 time steps yields Pref = 0.11973
+(the intrinsic value at t = 0 is K −S0 = 0.1). The solver returns −Y0 = 0.11638, an absolute
+gap of −0.0034 and a relative deviation of −2.8%.
+Figure 1 collects the three diagnostics. Panel 1a displays, on the left, three realised value
+paths Yt with the corresponding moving obstacle −ξt; the value process stays below the obstacle
+pathwise and makes contact during sufficiently in-the-money excursions. On the right, the same
+panel shows the realised control process Zt, which fluctuates around −σ · ∂xu and is mostly
+negative (the put has nonpositive delta in the state Xt = log St). Panel 1b is the histogram of
+the realised first-contact times τ ∗of Theorem 3.1 across 1024 simulated paths. Roughly 41%
+of paths exit strictly before T, with mean conditional stopping time ¯τ∗≈0.47. The cluster of
+values just below T visible in the histogram is largely a consequence of the imposed terminal
+contact YT = −ξT , since the contact time detector therefore identifies paths near the terminal
+step. Panel 1c reports the training loss for the terminal step n = N −2 on a log scale; the
+loss drops by more than two orders of magnitude and plateaus near 10−4. The losses at the
+other time steps are of the same shape and reach smaller magnitudes (closer to 10−6), since
+the conditional-expectation regression smooths the obstacle non-smoothness as it propagates
+backward.
+7.2
+Bounded discount rate ambiguity
+This case applies the scheme to the driver of Section 6.1, g(y) = supβ∈[β,β]{−βy}, which is
+convex in y but no longer affine. Both branches of the sup become active only when Y visits
+both signs, so a nonnegative put payoff would pin Y ≤0 and collapse the band to β. We
+therefore take the collared obstacle
+ξt = c tanh
+ Xt/c
+
+,
+dXt = dWt,
+which is sign changing, and bounded by c as required by (H2). It is smooth with bounded
+derivatives of every order, so it satisfies (R1) and (R2) as well, and this is the one test case for
+which the rate in Proposition 5.4 is available. Parameters are listed in Table 3.
+The solver returns Y0 = −0.0846. Across interior time steps, 44.7% of (t, ω) samples have
+Yt ≥0, confirming that both branches of the sup are exercised. Evaluated on 8192 simulated
+paths, a fraction 0.54 of paths make first contact strictly before T, with mean ¯τ ∗≈0.43.
+Figure 2 reports the diagnostics. Panel 2a shows, on the left, the value process Yt together
+with the moving obstacle −ξt for three sample paths; the value stays below the obstacle and
+25
+
+(a) Three sample paths: left, Yt and obstacle −ξt; right, control process Zt.
+(b) Histogram of τ ∗over 1024 paths (early-stop
+fraction ≈0.41).
+(c) Training loss at the terminal step n = N −2
+(log scale).
+Figure 1: Black–Scholes American put: diagnostics from a single trained run.
+Forward
+dXt = dWt
+X0 = 0
+Obstacle process
+ξt = c tanh(Xt/c)
+sign-changing, |ξ| ≤c
+Collar level
+c
+1.0
+Lower discount bound
+β
+0.0
+Upper discount bound
+β
+0.1
+Time horizon
+T
+1.0
+Table 3: Forward, obstacle and discount band, Section 6.1 case.
+makes contact on excursions where Xt becomes sufficiently negative. The collar flattens the
+obstacle for large |Xt|, so contact occurs earlier than it would for an unbounded payoff. On the
+right, the same panel shows the control process Zt, which carries the trend of the sign-changing
+obstacle and is damped where the collar saturates. Panel 2b is the histogram of τ ∗over the
+paths making contact before T, the terminal step being excluded by construction. The mass is
+concentrated in the interior of [0, T], rising to a peak around t = 0.5 and decaying thereafter,
+with mean 0.43 and median 0.52. Panel 2c reports the terminal-step training loss; its order
+of magnitude and shape match Figure 1c, and the losses at earlier steps are smaller still. The
+band sup-structure does not destabilise the recursion.
+7.3
+Geometric American put under entropic-discount ambiguity
+This case is the non-Lipschitz target of the convergence analysis in Section 5: the driver of
+Section 6.5 carries the quadratic in z term (γ/2)|z|2 that lies outside the Lipschitz framework
+and motivates the discrete reflection and truncation analysis of Section 5. We demonstrate
+26
+
+(a) Three sample paths: left, Yt and obstacle −ξt = −c tanh(Xt/c); right, control process Zt.
+(b) Histogram of τ ∗over 8192 paths.
+(c) Training loss at the terminal step (log
+scale).
+Figure 2: Bounded discount rate ambiguity (Section 6.1): diagnostics from a single trained run.
+that the scheme, combined with truncation and the upper reflection projection, handles the
+superlinear driver and that the entropic ambiguity has a measurable effect on the conservative
+put price relative to Section 7.1.
+In the liability region Y ≤0 the driver of Section 6.5 reduces to g(y, z) = −δy + (γ/2)|z|2.
+We take δ = r, so the worst case discount equals the risk-free rate, and γ = 5 (motivated
+below). The forward dynamics, payoff and market parameters are inherited from Table 2; the
+additional ambiguity parameters are in Table 4.
+Worst-case discount
+δ
+0.05
+Entropic radius
+γ
+5.0
+Table 4: Ambiguity parameters, Section 6.5 case.
+A sweep over γ ∈{0.5, 1, 2, 5, 10} at fixed market parameters yields −Y0 equal to 0.115, 0.115,
+0.112, 0.109 and 0.107 respectively. Below γ ≈2 the entropic effect is buried in the optimal
+stopping bias; above γ ≈10 the conservative price approaches the intrinsic value K −S0 = 0.1
+and the continuation region collapses. The value γ = 5 keeps the price clearly above intrinsic
+while the quadratic term contributes meaningfully. At γ = 5 the solver returns −Y0 = 0.10881,
+a −6.5% shift from the Black–Scholes baseline of Section 7.1.
+Figure 3 reports the diagnostics. Panel 3a shows, on the left, the value process Yt with the
+moving obstacle −ξt = −(K −St)+ for three sample paths; the obstacle constraint is respected
+without measurable violation. On the right, the same panel shows the realised control process Zt,
+which is the quantity penalised quadratically by the entropic driver. Panel 3b is the histogram of
+τ ∗. Comparing with Figure 1b, two changes are visible. First, the cluster just below T remains
+27
+
+as a consequence of the imposed terminal contact YT = −ξT . Second, the rest of the distribution
+shifts toward earlier times: the early stop fraction rises from 0.41 in Section 7.1 to 0.82 here.
+This empirical shift is consistent with the increased contribution of the quadratic z term in the
+continuation region, although the experiment does not by itself establish a comparative statics
+result for the optimal stopping boundary. Panel 3c reports the terminal-step training loss; it
+has the same shape and the same order of magnitude as in Figures 1c–2c, with losses at the
+earlier time steps smaller by an order of magnitude. The superlinear driver therefore does not
+destabilise training under the hyperparameters of Table 1.
+(a) Three sample paths: left, Yt and obstacle −ξt = −(K −St)+; right, control process Zt.
+(b) Histogram of τ ∗over 1024 paths (early-stop
+fraction ≈0.82).
+(c) Training loss at the terminal step (log
+scale).
+Figure 3: Entropic-discount American put (Section 6.5): diagnostics from a single trained run
+at γ = 5.
+7.4
+Numerical verification of Theorem 3.2
+For each of the cases of Section 7.1–7.3 we test on the trained solver the three properties of
+Theorem 3.2 that can be read off from the value φ0(ξ) = Y0:
+(a) φ0(ξ + m) ≤φ0(ξ) for a constant shift m = 0.2;
+(b) φ0(ξ + m) ≥φ0(ξ) −m for the same shift;
+(e) φ0
+  1
+2ξ1 + 1
+2ξ2
+≥1
+2 φ0(ξ1) + 1
+2 φ0(ξ2) for a basket of two obstacles.
+Under the standing assumptions of Section 2.2, property (a) holds for every admissible driver,
+while property (b) holds for the drivers considered here because they are decreasing in y. Both
+properties must therefore be reproduced by the solver in all three cases. Concavity (e), on
+the other hand, is established only when the driver is affine in (y, z). This is the situation of
+28
+
+Section 7.1, where g(y) = −ry; the inequality (e) is therefore expected. In Section 7.2 and
+Section 7.3 the driver is convex but not affine, so Theorem 3.2 makes no prediction about the
+sign of φ0(1
+2ξ1 + 1
+2ξ2) −1
+2[φ0(ξ1) + φ0(ξ2)], and the corresponding entry of the table is reported
+only as an empirical observation on the chosen basket.
+For each case we train four networks, on the base obstacle and on its shifted, alternate, and
+basketed versions, at the hyperparameters of Table 1. We say that an inequality is satisfied
+numerically when the corresponding signed margin (defined in the caption of Table 5) is at least
+−0.02; this threshold is twice the variation observed across independent training replicates. The
+results are collected in Table 5.
+The two unconditional inequalities (a) and (b) are satisfied in every case. Concavity (e)
+holds in Section 7.1, in agreement with Theorem 3.2(e). In Sections 7.2 and 7.3 the signed
+margin is within the numerical tolerance, so the inequality is neither clearly satisfied nor clearly
+violated on the chosen baskets. This is consistent with Theorem 3.2, which asserts concavity
+only for affine drivers and makes no prediction here; the experiments neither confirm nor refute
+it for the two non-affine cases.
+Case
+(a)
+(b)
+(e)
+Section 7.1
++0.208
++0.012
++0.0044
+Section 7.2
++0.212
++0.008
+−0.009
+Section 7.3
++0.214
++0.006
++0.011
+Table 5: Signed margins of the three inequalities of Theorem 3.2 at m = 0.2 and λ =
+1
+2.
+The quantities tabulated are φ0(ξ) −φ0(ξ + m) for (a), φ0(ξ + m) −φ0(ξ) + m for (b), and
+φ0(1
+2ξ1 + 1
+2ξ2)−1
+2[φ0(ξ1)+φ0(ξ2)] for (e). The numerical tolerance is 0.02. Baskets: Section 7.1
+and Section 7.3 use puts with strikes K1 = 1.1, K2 = 0.9; Section 7.2 uses ξ1
+t = c tanh(Xt/c)
+and ξ2
+t = c tanh
+ (X2
+t −0.5)/c
+
+, the collar of Section 7.2 applied to both.
+References
+[1] Philippe Artzner, Freddy Delbaen, Jean-Marc Eber, David Heath, and Hyejin Ku. Coherent
+multiperiod risk adjusted values and Bellman’s principle. Annals of Operations Research,
+152(1):5–22, 2007.
+[2] Pauline Barrieu and Nicole El Karoui. Pricing, hedging and optimally designing derivatives
+via minimization of risk measures. In Ren´e Carmona, editor, Indifference Pricing: Theory
+and Applications. Princeton University Press, Princeton, NJ, 2008.
+[3] Erhan Bayraktar, Ioannis Karatzas, and Song Yao. Optimal stopping for dynamic convex
+risk measures. Illinois Journal of Mathematics, 54(3):1025–1067, 2010.
+[4] Jocelyne Bion-Nadal. Dynamic risk measures: Time consistency and risk measures from
+BMO martingales. Finance and Stochastics, 12(2):219–244, 2008.
+[5] Philippe Briand, Fran¸cois Coquet, Ying Hu, Jean M´emin, and Shige Peng. A converse
+comparison theorem for BSDEs and related properties of g-expectations. Electronic Communications in Probability, 5:101–117, 2000.
+[6] Jean-Fran¸cois Chassagneux and Adrien Richou. Numerical simulation of quadratic BSDEs.
+The Annals of Applied Probability, 26(1):262–304, 2016.
+[7] Patrick Cheridito, Freddy Delbaen, and Michael Kupper. Coherent and convex monetary
+risk measures for unbounded c`adl`ag processes.
+Finance and Stochastics, 9(3):369–387,
+2005.
+29
+
+[8] Fran¸cois Coquet, Ying Hu, Jean M´emin, and Shige Peng. Filtration-consistent nonlinear
+expectations and related g-expectations. Probability Theory and Related Fields, 123:1–27,
+2002.
+[9] Freddy Delbaen. The structure of m-stable sets and in particular of the set of risk neutral
+measures. In In Memoriam Paul-Andr´e Meyer: S´eminaire de Probabilit´es XXXIX, pages
+215–258. Springer, Berlin, Heidelberg, 2006.
+[10] Freddy Delbaen, Shige Peng, and Emanuela Rosazza Gianin. Representation of the penalty
+term of dynamic concave utilities. Finance and Stochastics, 14(3):449–472, 2010.
+[11] Kai Detlefsen and Giacomo Scandolo.
+Conditional and dynamic convex risk measures.
+Finance and Stochastics, 9(4):539–561, 2005.
+[12] Giulia Di Nunno and Emanuela Rosazza Gianin. Capturing cash non-additivity and horizon
+risk via BSDEs and generalized shortfall, 2026. arXiv preprint arXiv:2603.14024.
+[13] Nicole El Karoui, Christophe Kapoudjian, ´Etienne Pardoux, Shige Peng, and Marie-Claire
+Quenez. Reflected solutions of backward SDEs, and related obstacle problems for PDEs.
+The Annals of Probability, 25(2):702–737, 1997.
+[14] Nicole El Karoui, Shige Peng, and Marie-Claire Quenez. Backward stochastic differential
+equations in finance. Mathematical Finance, 7(1):1–71, 1997.
+[15] Nicole El Karoui and Marie-Claire Quenez.
+Non-linear pricing theory and backward
+stochastic differential equations.
+In Financial Mathematics, pages 191–246. Springer,
+Berlin, Heidelberg, 2006.
+[16] Nicole El Karoui and Claudia Ravanelli. Cash subadditive risk measures and interest rate
+ambiguity. Mathematical Finance, 19(4):561–590, 2009.
+[17] Marco Frittelli and Emanuela Rosazza Gianin. Dynamic convex risk measures. In Giorgio
+Szeg¨o, editor, Risk Measures for the 21st Century, pages 227–248. John Wiley & Sons,
+2004.
+[18] Ruimeng Hu and Yihan Zou. Deep learning for reflected BSDEs: Regularization and error
+analysis, 2026. arXiv preprint arXiv:2609.05434.
+[19] Cˆome Hur´e, Huyˆen Pham, and Xavier Warin. Deep backward schemes for high-dimensional
+nonlinear PDEs. Mathematics of Computation, 89(324):1547–1579, 2020.
+[20] Peter E. Kloeden and Eckhard Platen. Numerical Solution of Stochastic Differential Equations, volume 23 of Applications of Mathematics. Springer, Berlin, 1992.
+[21] Magdalena Kobylanski. Backward stochastic differential equations and partial differential
+equations with quadratic growth. The Annals of Probability, 28(2):558–602, 2000.
+[22] Magdalena Kobylanski, Jean-Pierre Lepeltier, Marie-Claire Quenez, and Santiago Torres. Reflected BSDE with superlinear quadratic coefficient. Probability and Mathematical
+Statistics, 22:51–83, 2002.
+[23] Elisa Mastrogiacomo and Emanuela Rosazza Gianin. Time-consistency of cash-subadditive
+risk measures, 2015. arXiv preprint arXiv:1512.03641.
+[24] Shige Peng. BSDE and related g-expectation. In Nicole El Karoui and Laurent Mazliak,
+editors, Backward Stochastic Differential Equations, volume 364 of Pitman Research Notes
+in Mathematics Series, pages 141–159. 1997.
+30
+
+[25] Marie-Claire Quenez and Agn`es Sulem. Reflected BSDEs and robust optimal stopping
+for dynamic risk measures with jumps.
+Stochastic Processes and their Applications,
+124(9):3031–3054, 2014.
+[26] Emanuela Rosazza Gianin. Risk measures via g-expectations. Insurance: Mathematics and
+Economics, 39(1):19–34, 2006.
+[27] Dingqian Sun, Gechun Liang, and Shanjian Tang.
+Quantitative stability and numerical analysis of markovian quadratic BSDEs with reflection. Probability, Uncertainty and
+Quantitative Risk, 7(1):13–30, 2022.
+31

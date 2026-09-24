@@ -1,10 +1,11 @@
-"""수집한 논문을 자동 분석한다.
+"""수집한 논문을 자동 분석한다. PDF 본문(data/fulltext/)이 있으면 본문 기준으로 분석한다.
 
 1. TF-IDF 핵심 키워드 추출 (논문별 / 전체)
-2. 사전 기반 태깅: ML 방법론 · 금융 과제 · 데이터 유형
-3. 추출 요약 (TF-IDF 점수가 높은 문장 2개)
-4. 논문 간 코사인 유사도
-5. 그림(figures/) + 마크다운 리포트(reports/analysis_report.md) + CSV(data/)
+2. 사전 기반 태깅: ML 방법론 · 금융 과제 · 데이터 유형 (본문 언급 횟수 기준)
+3. 본문 정보 추출: 사용 데이터셋/시장, 평가지표, 섹션 구성, 그림·표 수
+4. 추출 요약: 초록 요약 + 결론 섹션 요약
+5. 논문 간 코사인 유사도
+6. 그림(figures/) + 마크다운 리포트(reports/analysis_report.md) + CSV(data/)
 """
 from __future__ import annotations
 
@@ -21,61 +22,109 @@ import pandas as pd
 from sklearn.feature_extraction.text import ENGLISH_STOP_WORDS, TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
+from pdf_fulltext import body_text, split_sections
+
 EXTRA_STOP = {"paper", "propose", "proposed", "approach", "method", "methods", "results", "using",
-              "based", "study", "show", "model", "models", "data", "new", "use", "used", "also"}
+              "based", "study", "show", "model", "models", "data", "new", "use", "used", "also",
+              "et", "al", "fig", "figure", "table", "section", "eq", "arxiv", "https", "http", "www",
+              "doi", "org", "let", "given", "denote", "denotes", "respectively", "thus", "does", "non"}
 STOP_WORDS = list(ENGLISH_STOP_WORDS | EXTRA_STOP)
+
+# 본문에서 이 횟수 이상 언급되어야 태그를 붙인다 (제목·초록에 나오면 1회로 충분)
+MIN_BODY_MENTIONS = 3
 
 TAXONOMY = {
     "ml_method": {
-        "LLM / Foundation Model": r"\b(llm|large language model|gpt|language model|foundation model|agent)",
-        "Transformer / Attention": r"\b(transformer|attention)",
-        "Reinforcement Learning": r"\b(reinforcement learning|q-learning|policy gradient|\brl\b|actor-critic)",
-        "Graph Neural Network": r"\b(graph neural|gnn|graph convolution)",
-        "RNN / LSTM": r"\b(lstm|gru|recurrent)",
-        "Generative (Diffusion/GAN/VAE)": r"\b(diffusion|gan\b|generative adversarial|vae\b|variational autoencoder|generative)",
-        "Tree Ensemble": r"\b(xgboost|lightgbm|random forest|gradient boost)",
-        "Deep Learning (general)": r"\b(deep learning|neural network|cnn|convolutional|mixture-of-experts)",
+        "LLM / Foundation Model": r"\b(llms?|large language models?|gpt|foundation models?)\b",
+        "Transformer / Attention": r"\b(transformers?|self-attention|attention mechanism)\b",
+        "Reinforcement Learning": r"\b(reinforcement learning|q-learning|policy gradient|actor-critic|bandits?)\b",
+        "Graph Neural Network": r"\b(graph neural|gnns?|graph convolution)",
+        "RNN / LSTM": r"\b(lstm|gru|recurrent neural)",
+        "Generative (Diffusion/GAN/VAE)": r"\b(diffusion models?|gans?|generative adversarial|vaes?|variational autoencoder)\b",
+        "Tree Ensemble": r"\b(xgboost|lightgbm|random forests?|gradient boost)",
+        "Deep Learning (general)": r"\b(deep learning|neural networks?|cnns?|convolutional|mixture-of-experts|mlp)\b",
         "Multi-task / Transfer": r"\b(multi-task|transfer learning|meta-learning)",
-        "Bayesian / Probabilistic": r"\b(bayesian|gaussian process|probabilistic)",
-        "Machine Learning (general)": r"\b(machine learning|supervised|classifier|regression tree)",
+        "Bayesian / Probabilistic": r"\b(bayesian|gaussian process)",
+        "Machine Learning (general)": r"\b(machine learning|supervised learning|classifiers?)\b",
     },
     "finance_task": {
-        "Return / Price Prediction": r"\b(return prediction|forecast|price prediction|predict(ing)? (stock|return|price))",
-        "Portfolio Optimization": r"\b(portfolio|asset allocation)",
-        "Trading / Execution": r"\b(trading|execution|market making|order book|high-frequency)",
-        "Risk / Volatility": r"\b(volatility|risk|value-at-risk|var\b|tail)",
-        "Derivatives / Option Pricing": r"\b(option pricing|derivative|hedging|implied volatility)",
-        "Credit / Default": r"\b(credit|default|loan|bankruptcy)",
-        "Fraud / AML": r"\b(fraud|anti-money|aml\b|anomaly)",
-        "Factor / Asset Pricing": r"\b(factor|asset pricing|cross-section|anomal)",
-        "Crypto": r"\b(crypto|bitcoin|blockchain|defi)",
+        "Return / Price Prediction": r"\b(return prediction|return forecasting|price prediction|stock forecasting|predict(ing)? (stock|returns?|prices?))",
+        "Portfolio Optimization": r"\b(portfolio optimi[sz]ation|asset allocation|portfolio construction)",
+        "Trading / Execution": r"\b(trading strateg(y|ies)|algorithmic trading|execution|market making|order book|high-frequency)",
+        "Risk / Volatility": r"\b(volatility|risk measures?|value-at-risk|expected shortfall|tail risk)",
+        "Derivatives / Option Pricing": r"\b(option pricing|derivatives pricing|hedging|implied volatility)",
+        "Credit / Default": r"\b(credit risk|default|loans?|bankruptcy)\b",
+        "Fraud / AML": r"\b(fraud|anti-money laundering|aml)\b",
+        "Factor / Asset Pricing": r"\b(factor (mining|model|investing|zoo)|asset pricing|cross-section(al)? (of )?returns?|alpha factors?)",
+        "Crypto": r"\b(crypto(currenc(y|ies))?|bitcoin|blockchain|defi)\b",
     },
     "data_type": {
-        "Time Series": r"\b(time series|time-series|temporal)",
-        "Text / News / Sentiment": r"\b(news|sentiment|text|textual|earnings call|social media)",
-        "Limit Order Book": r"\b(limit order book|\blob\b|order flow)",
-        "Synthetic / Simulation": r"\b(synthetic|simulat)",
-        "Fundamental / Accounting": r"\b(fundamental|accounting|financial statement)",
+        "Time Series": r"\b(time series|time-series)",
+        "Text / News / Sentiment": r"\b(news|sentiment|earnings calls?|social media|textual)",
+        "Limit Order Book": r"\b(limit order book|order flow)",
+        "Synthetic / Simulation": r"\b(synthetic data|simulation study|monte carlo|simulated)",
+        "Fundamental / Accounting": r"\b(fundamentals?|accounting|financial statements?)\b",
     },
 }
 
+# 본문에서 찾는 데이터셋·시장 이름
+DATASETS = {
+    "S&P 500": r"s&p\s?500", "CSI 300": r"csi\s?300", "CSI 500": r"csi\s?500", "NASDAQ": r"nasdaq",
+    "Dow Jones / DJIA": r"dow jones|djia", "NYSE": r"\bnyse\b", "Russell": r"russell\s?\d{4}",
+    "CRSP": r"\bcrsp\b", "Compustat": r"compustat", "WRDS": r"\bwrds\b", "TAQ": r"\btaq\b",
+    "LOBSTER": r"\blobster\b", "Bloomberg": r"bloomberg", "Reuters": r"reuters", "Yahoo Finance": r"yahoo finance",
+    "FNSPID": r"fnspid", "Bitcoin": r"bitcoin|\bbtc\b", "KOSPI": r"kospi", "Nikkei": r"nikkei",
+    "Fama-French": r"fama[- ]french", "FRED": r"\bfred\b", "EDGAR / SEC filings": r"edgar|10-k|sec filings",
+}
+METRICS = {
+    "Sharpe ratio": r"sharpe", "Sortino": r"sortino", "Max drawdown": r"max(imum)? drawdown|\bmdd\b",
+    "Annualized return": r"annuali[sz]ed returns?|\barr\b", "IC / Rank IC": r"\brank ?ic\b|\bic\b|information coefficient",
+    "RMSE / MSE": r"\brmse\b|\bmse\b|mean squared error", "MAE": r"\bmae\b|mean absolute error",
+    "Accuracy": r"\baccuracy\b", "F1": r"\bf1\b", "AUC": r"\bauc\b|roc curve", "R²": r"\br\^?2\b|r-squared|\br²",
+    "VaR / ES": r"value-at-risk|\bvar\b|expected shortfall|\bcvar\b", "Turnover": r"turnover",
+}
 
-def _doc(row: pd.Series) -> str:
+
+def _load_fulltext(df: pd.DataFrame, root: Path) -> pd.DataFrame:
+    texts = []
+    for _, r in df.iterrows():
+        path = r.get("fulltext_path")
+        texts.append((root / path).read_text(encoding="utf-8") if isinstance(path, str) and (root / path).exists() else "")
+    return df.assign(fulltext=texts)
+
+
+def _head(row: pd.Series) -> str:
     return f"{row['title']}. {row.get('abstract') or ''}"
 
 
+def _doc(row: pd.Series) -> str:
+    """분석용 문서: 본문이 있으면 참고문헌 전까지의 본문, 없으면 제목+초록."""
+    return f"{_head(row)} {body_text(row['fulltext'])}" if row["fulltext"] else _head(row)
+
+
 def tag_papers(df: pd.DataFrame) -> pd.DataFrame:
-    tags = {}
-    for group, rules in TAXONOMY.items():
-        tags[group] = [
-            "; ".join(name for name, pat in rules.items() if re.search(pat, _doc(r).lower())) or "-"
-            for _, r in df.iterrows()
-        ]
+    tags = {group: [] for group in TAXONOMY}
+    for _, r in df.iterrows():
+        head, body = _head(r).lower(), body_text(r["fulltext"]).lower()
+        for group, rules in TAXONOMY.items():
+            hits = [name for name, pat in rules.items()
+                    if re.search(pat, head) or len(re.findall(pat, body)) >= MIN_BODY_MENTIONS]
+            tags[group].append("; ".join(hits) or "-")
     return df.assign(**tags)
 
 
-def extract_keywords(df: pd.DataFrame, top_k: int = 8):
-    vec = TfidfVectorizer(stop_words=STOP_WORDS, ngram_range=(1, 2), min_df=1,
+def find_mentions(df: pd.DataFrame, vocab: dict[str, str], min_count: int = 2) -> list[str]:
+    out = []
+    for _, r in df.iterrows():
+        text = _doc(r).lower()
+        counts = {name: len(re.findall(pat, text)) for name, pat in vocab.items()}
+        hits = sorted((n for n, c in counts.items() if c >= min_count), key=lambda n: -counts[n])
+        out.append("; ".join(f"{n}({counts[n]})" for n in hits) or "-")
+    return out
+
+
+def extract_keywords(df: pd.DataFrame, top_k: int = 10):
+    vec = TfidfVectorizer(stop_words=STOP_WORDS, ngram_range=(1, 2), min_df=1, max_df=0.8 if len(df) > 2 else 1.0,
                           token_pattern=r"(?u)\b[a-zA-Z][a-zA-Z\-]{2,}\b", sublinear_tf=True)
     X = vec.fit_transform(df.apply(_doc, axis=1))
     vocab = np.array(vec.get_feature_names_out())
@@ -86,13 +135,27 @@ def extract_keywords(df: pd.DataFrame, top_k: int = 8):
 
 def summarize(text: str, n_sent: int = 2) -> str:
     """문장 단위 TF-IDF 점수로 핵심 문장을 원래 순서대로 뽑는 추출 요약."""
-    sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text or "") if len(s.split()) > 5]
+    sents = [s.strip() for s in re.split(r"(?<=[.!?])\s+", text or "") if 6 < len(s.split()) < 60]
     if len(sents) <= n_sent:
-        return " ".join(sents) or (text or "")
+        return " ".join(sents) or (text or "")[:400]
     X = TfidfVectorizer(stop_words=STOP_WORDS).fit_transform(sents)
     scores = np.asarray(X.sum(axis=1)).ravel() / np.sqrt(np.array([len(s.split()) for s in sents]))
     keep = sorted(np.argsort(scores)[::-1][:n_sent])
     return " ".join(sents[i] for i in keep)
+
+
+def structure_stats(text: str) -> dict:
+    if not text:
+        return {"sections": "-", "n_figures": None, "n_tables": None, "n_words": None, "conclusion_summary": "-"}
+    sections = split_sections(text)
+    body = body_text(text)
+    return {
+        "sections": ", ".join(k for k in sections if k != "references") or "-",
+        "n_figures": len(set(re.findall(r"\bFig(?:ure|\.)\s?(\d+)", body))),
+        "n_tables": len(set(re.findall(r"\bTable\s?(\d+)", body))),
+        "n_words": len(body.split()),
+        "conclusion_summary": summarize(sections.get("conclusion", ""), 3) if "conclusion" in sections else "-",
+    }
 
 
 def plot_keywords(overall: pd.Series, path: Path, top: int = 15) -> None:
@@ -136,38 +199,51 @@ def plot_tags(df: pd.DataFrame, path: Path) -> None:
     plt.close(fig)
 
 
+def _fmt(v) -> str:
+    return "-" if v is None or (isinstance(v, float) and np.isnan(v)) else f"{int(v):,}"
+
+
 def write_report(df: pd.DataFrame, overall: pd.Series, sim: np.ndarray, path: Path) -> None:
     labels = [f"P{i + 1}" for i in range(len(df))]
     iu = np.triu_indices(len(df), k=1)
     best = int(np.argmax(sim[iu])) if len(iu[0]) else None
+    n_full = int((df["fulltext"] != "").sum())
 
     lines = [
         "# 금융 머신러닝 최신 논문 자동 분석 리포트",
         "",
         f"- 생성 시각: {datetime.now():%Y-%m-%d %H:%M}",
-        f"- 논문 수: {len(df)}편 (출처: {', '.join(df['source'].unique())})",
+        f"- 논문 수: {len(df)}편 (출처: {', '.join(df['source'].unique())}) · PDF 본문 분석 {n_full}편",
         f"- 전체 상위 키워드: {', '.join(overall.head(10).index)}",
         "",
         "## 1. 논문 목록",
         "",
-        "| # | 제목 | 게재일 | ML 방법론 | 금융 과제 |",
-        "|---|---|---|---|---|",
+        "| # | 제목 | 게재일 | 쪽수 | ML 방법론 | 금융 과제 |",
+        "|---|---|---|---|---|---|",
     ]
     for lab, (_, r) in zip(labels, df.iterrows()):
-        lines.append(f"| {lab} | [{r['title']}]({r['url']}) | {r['published']} | {r['ml_method']} | {r['finance_task']} |")
+        pdf = f" · [PDF](../{r['pdf_path']})" if isinstance(r.get("pdf_path"), str) else ""
+        lines.append(f"| {lab} | [{r['title']}]({r['url']}){pdf} | {r['published']} | {_fmt(r.get('n_pages'))} "
+                     f"| {r['ml_method']} | {r['finance_task']} |")
 
     lines += ["", "## 2. 논문별 분석", ""]
     for lab, (_, r) in zip(labels, df.iterrows()):
+        cited = f" · 인용 {int(r['cited_by'])}회" if pd.notna(r.get("cited_by")) else ""
         lines += [
             f"### {lab}. {r['title']}",
             "",
             f"- **저자**: {r['authors']}",
-            f"- **게재**: {r['venue']} ({r['published']})" + (f" · 인용 {int(r['cited_by'])}회" if pd.notna(r.get('cited_by')) else ""),
+            f"- **게재**: {r['venue']} ({r['published']}){cited}",
+            f"- **분량**: {_fmt(r.get('n_pages'))}쪽 · 본문 {_fmt(r['n_words'])}단어 · 그림 {_fmt(r['n_figures'])}개 · 표 {_fmt(r['n_tables'])}개",
+            f"- **섹션 구성**: {r['sections']}",
             f"- **ML 방법론**: {r['ml_method']}",
             f"- **금융 과제**: {r['finance_task']}",
             f"- **데이터 유형**: {r['data_type']}",
+            f"- **사용 데이터셋·시장 (언급 횟수)**: {r['datasets']}",
+            f"- **평가지표 (언급 횟수)**: {r['metrics']}",
             f"- **핵심 키워드**: {r['keywords']}",
-            f"- **자동 요약**: {r['summary']}",
+            f"- **초록 요약**: {r['summary']}",
+            f"- **결론 요약**: {r['conclusion_summary']}",
             "",
         ]
 
@@ -194,9 +270,13 @@ def analyze(root: Path) -> pd.DataFrame:
     rep_dir.mkdir(exist_ok=True)
 
     df = pd.read_csv(data_dir / "papers.csv", encoding="utf-8-sig")
+    df = _load_fulltext(df, root)
     df = tag_papers(df)
     X, df["keywords"], overall = extract_keywords(df)
     df["summary"] = df["abstract"].fillna("").map(summarize)
+    df["datasets"] = find_mentions(df, DATASETS)
+    df["metrics"] = find_mentions(df, METRICS)
+    df = pd.concat([df, pd.DataFrame([structure_stats(t) for t in df["fulltext"]], index=df.index)], axis=1)
     sim = cosine_similarity(X)
 
     labels = [f"P{i + 1}" for i in range(len(df))]
@@ -204,7 +284,7 @@ def analyze(root: Path) -> pd.DataFrame:
     plot_similarity(sim, labels, fig_dir / "similarity_heatmap.png")
     plot_tags(df, fig_dir / "tag_distribution.png")
 
-    df.to_csv(data_dir / "papers_analysis.csv", index=False, encoding="utf-8-sig")
+    df.drop(columns="fulltext").to_csv(data_dir / "papers_analysis.csv", index=False, encoding="utf-8-sig")
     pd.DataFrame(sim, index=labels, columns=labels).round(4).to_csv(data_dir / "similarity_matrix.csv")
     write_report(df, overall, sim, rep_dir / "analysis_report.md")
     print(f"[analyze] 리포트: {rep_dir / 'analysis_report.md'}")

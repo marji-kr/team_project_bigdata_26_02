@@ -1,5 +1,5 @@
 {
-  "collected_at": "2026-09-24T14:54:19",
+  "collected_at": "2026-09-24T15:04:13",
   "papers": [
     {
       "id": "2609.27051v1",
@@ -12,7 +12,10 @@
       "cited_by": null,
       "url": "http://arxiv.org/abs/2609.27051v1",
       "pdf_url": "https://arxiv.org/pdf/2609.27051v1",
-      "source": "arxiv"
+      "source": "arxiv",
+      "pdf_path": "data/pdfs/2609.27051v1.pdf",
+      "fulltext_path": "data/fulltext/2609.27051v1.txt",
+      "n_pages": 37
     },
     {
       "id": "2609.25617v1",
@@ -25,7 +28,10 @@
       "cited_by": null,
       "url": "http://arxiv.org/abs/2609.25617v1",
       "pdf_url": "https://arxiv.org/pdf/2609.25617v1",
-      "source": "arxiv"
+      "source": "arxiv",
+      "pdf_path": "data/pdfs/2609.25617v1.pdf",
+      "fulltext_path": "data/fulltext/2609.25617v1.txt",
+      "n_pages": 9
     },
     {
       "id": "2609.25144v1",
@@ -38,7 +44,10 @@
       "cited_by": null,
       "url": "http://arxiv.org/abs/2609.25144v1",
       "pdf_url": "https://arxiv.org/pdf/2609.25144v1",
-      "source": "arxiv"
+      "source": "arxiv",
+      "pdf_path": "data/pdfs/2609.25144v1.pdf",
+      "fulltext_path": "data/fulltext/2609.25144v1.txt",
+      "n_pages": 16
     },
     {
       "id": "2609.23768v1",
@@ -51,7 +60,10 @@
       "cited_by": null,
       "url": "http://arxiv.org/abs/2609.23768v1",
       "pdf_url": "https://arxiv.org/pdf/2609.23768v1",
-      "source": "arxiv"
+      "source": "arxiv",
+      "pdf_path": "data/pdfs/2609.23768v1.pdf",
+      "fulltext_path": "data/fulltext/2609.23768v1.txt",
+      "n_pages": 31
     },
     {
       "id": "2609.23703v1",
@@ -64,7 +76,10 @@
       "cited_by": null,
       "url": "http://arxiv.org/abs/2609.23703v1",
       "pdf_url": "https://arxiv.org/pdf/2609.23703v1",
-      "source": "arxiv"
+      "source": "arxiv",
+      "pdf_path": "data/pdfs/2609.23703v1.pdf",
+      "fulltext_path": "data/fulltext/2609.23703v1.txt",
+      "n_pages": 47
     }
   ]
 }
