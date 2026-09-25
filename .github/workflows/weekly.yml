@@ -1,0 +1,43 @@
+# 매주 월요일 오전 9시(KST)에 새 논문 5편을 추가하고 보고서를 갱신해 저장소에 커밋한다.
+# Actions 탭 → "Weekly paper update" → "Run workflow" 로 수동 실행도 가능.
+# LLM 분류까지 하려면 Settings → Secrets and variables → Actions 에 ANTHROPIC_API_KEY 를 등록.
+name: Weekly paper update
+
+on:
+  schedule:
+    - cron: "0 0 * * 1"   # 매주 월요일 00:00 UTC = 09:00 KST
+  workflow_dispatch:
+    inputs:
+      n:
+        description: "추가할 논문 수"
+        default: "5"
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+          cache: pip
+
+      - run: pip install -r requirements.txt
+
+      - name: Add new papers and rebuild report
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          PYTHONIOENCODING: utf-8
+        run: python run.py weekly --n ${{ github.event.inputs.n || '5' }}
+
+      - name: Commit results
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898283+github-actions[bot]@users.noreply.github.com"
+          git add data outputs
+          git diff --cached --quiet || git commit -m "Weekly update: add new papers ($(date +%F))"
+          git push

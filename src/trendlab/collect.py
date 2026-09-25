@@ -90,3 +90,29 @@ def collect(reference: date) -> list[dict]:
             "queries": config.ARXIV_QUERIES, "n_raw": len(all_rows)}
     (config.RAW_DIR / "collection_meta.json").write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
     return all_rows
+
+
+def fetch_latest(n: int, exclude_ids: set[str], is_relevant) -> list[dict]:
+    """주간 업데이트용: 가장 최근 제출된 논문부터 훑어 기존 데이터에 없고 관련성 있는 논문 n편을 모은다."""
+    session = requests.Session()
+    session.headers["User-Agent"] = "trendlab/1.0 (graduate course project)"
+    query = " OR ".join(f"({q})" for q in config.ARXIV_QUERIES.values())
+    picked, seen, offset = [], set(exclude_ids), 0
+    while len(picked) < n and offset < 1000:
+        resp = session.get(API, params={"search_query": query, "start": offset, "max_results": 100,
+                                        "sortBy": "submittedDate", "sortOrder": "descending"}, timeout=90)
+        resp.raise_for_status()
+        entries = ET.fromstring(resp.content).findall(f"{ATOM}entry")
+        if not entries:
+            break
+        for e in entries:
+            row = _entry(e, "weekly")
+            if row["arxiv_id"] in seen or not is_relevant(row["title"], row["abstract"], row["categories"]):
+                continue
+            seen.add(row["arxiv_id"])
+            picked.append(row)
+            if len(picked) == n:
+                break
+        offset += 100
+        time.sleep(3)
+    return picked

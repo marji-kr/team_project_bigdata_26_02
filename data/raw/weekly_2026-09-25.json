@@ -1,0 +1,67 @@
+[
+ {
+  "arxiv_id": "2609.29014",
+  "title": "AlphaDiverse: Post-Training Local Quantitative Research Agents for Diverse Exploration in Alpha Factor Mining",
+  "abstract": "Large language model (LLM)-based multi-agent systems can automate alpha factor mining, but their reliance on external APIs limits control over cost, availability, and confidentiality. Long research loops also tend to revisit a few successful economic mechanisms that lead to research path collapse. To address these limitations, we propose AlphaDiverse, a framework that integrates a multi-agent alpha research system, diverse research path collection, and post-training for local agents. We let the research system generate complementary plan portfolios and vary research environments across loops to collect diverse research paths. Using these diverse traces, we warm-start local Planner and Realizer agents with supervised fine-tuning. Then, we propose a joint GRPO method to optimize both of them using predictive quality and diversity of contributions. Research feedback is confined to inner period data, while a frozen final model is evaluated on a later outer period data, thereby avoiding test-set tuning. Experiments across four Chinese stock universes show that AlphaDiverse can combine competitive prediction with broader exploration.",
+  "published": "2026-09-24",
+  "updated": "2026-09-24",
+  "authors": "Qingzhuo Wang; Zikun Wei; Zhihua Wei; Wen Shen",
+  "primary_category": "cs.AI",
+  "categories": "cs.AI; cs.CE; cs.MA",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2609.29014v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2609.27051",
+  "title": "Propose, Don't Judge: An Anytime-Valid Referee for LLM Agents That Mine Investment Factors",
+  "abstract": "Language-model agents now run the whole of quantitative factor research: they propose investment factors, backtest them, select the survivors and retire them. We ask which of those jobs an agent should keep. Our answer is governed self-evolution: the agent may propose, and a frozen statistical referee that the agent cannot touch must judge. The referee scores each candidate only on market outcomes revealed after submission, by betting, so its false-discovery guarantee holds at every stopping time for any proposal policy. We cross three proposers (a script, a bandit and a language model) with this referee and with three deliberately leaky ones, in a synthetic world with planted truth, a probe-authoring environment and a ten-year walk-forward on the CSI 500. Who judges sets the number of false admissions: the frozen referee admits 5-11 times fewer sub-threshold factors than the leaky referees under a scripted proposer, and no proposer closes that gap. Who proposes sets the yield: the language model beats the script, matches the bandit, and adds the one capability a bandit lacks, writing its own diagnostic probes. The certificate's price is time: an admitted true factor waits about 500 trading days, and the certified portfolio's Sharpe ratio therefore trails an ungated one. Judging belongs to the procedure; proposing and instrument-making belong to the agent.",
+  "published": "2026-09-22",
+  "updated": "2026-09-22",
+  "authors": "Bo Qu; Mingguang Chen; Licheng Wang",
+  "primary_category": "cs.AI",
+  "categories": "cs.AI; q-fin.PM; q-fin.ST",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2609.27051v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2609.25144",
+  "title": "The Informational Content in Lepto-Variance and Its Relation to Higher Moments",
+  "abstract": "Lepto-regression is defined as the machine learning process of constructing a Regression Tree of a target feature on itself. It is a novel, model-free method potentially revealing information on important sample structure properties. But it is yet not clear what the informational content of lepto-variance is and how it is related to other well-known statistics of a sample. One significant finding is that 58% of the historical US stock return variability is 1-bit lepto-variance that can not be explained by any financial factor. The central question investigated in this paper is to use small normal N(0, 1) drawn samples to explore how the 1-bit sample lepto-variance and lepto-ratio relate to sample variance, skewness and excess kurtosis. Using a large sample simulation, the lepto ratio of a normal is found to converge to 36.3%. For smaller normally distributed simulated N(0, 1) samples, while lepto-variance itself is highly correlated to sample variance, lepto-variance as a fraction of total variance is highly correlated to excess kurtosis. Both lepto-variance and lepto-ratio are orthogonal to sample skew. Another finding is that while lepto-ratio is strongly correlated to lepto-variance it remains orthogonal to sample variance.",
+  "published": "2026-09-21",
+  "updated": "2026-09-21",
+  "authors": "Vassilis Polimenis",
+  "primary_category": "stat.ME",
+  "categories": "stat.ME; cs.LG; q-fin.RM; stat.ML",
+  "doi": "10.4236/ib.2025.173013",
+  "url": "http://arxiv.org/abs/2609.25144v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2609.24175",
+  "title": "FinRankGRPO: Optimizing LLMs for Listwise Financial Asset Ranking via Group Relative Policy Optimization",
+  "abstract": "While Large Language Models (LLMs) excel at understanding unstructured financial contexts, their direct use in portfolio optimization is limited by a mismatch between next-token prediction and the listwise ranking objectives required for asset allocation. They also struggle with precise numerical forecasting, leading to instability and arithmetic hallucinations. To bridge this gap, we propose FinRankGRPO, a framework that shifts LLM based portfolio construction from direct numerical prediction to listwise ranking of financial assets. We introduce a two-stage training process, supervised finetuning on Chain-of-Thought reasoning data, followed by our Financial Asset Ranking via Group Relative Policy Optimization with a Spearman rank correlation reward that aligns generated asset rankings with ground truth market orderings. The second stage uses a novel Spearman rank correlation reward to explicitly align the model's generative preferences with ground truth market orderings. Experimental results show that FinRankGRPO outperforms traditional quantitative and state-of-the-art commercial models, achieving a Sharpe ratio of 0.636 and a Spearman correlation of 0.023.",
+  "published": "2026-09-21",
+  "updated": "2026-09-21",
+  "authors": "Ningyuan Deng; Jinyuan Wang; Qi Li; Jia Zhang; Yi Yang",
+  "primary_category": "cs.CE",
+  "categories": "cs.CE",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2609.24175v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2609.26828",
+  "title": "Bridging LLM Serving and CXL-SSDs with Chunk-Aware KV Cache Management",
+  "abstract": "NAND-backed storage offers the capacity needed to scale LLM prefix caching, but its block I/O path incurs CPU cache contention and host-DRAM staging in addition to NAND latency. Our characterization shows that these interface costs persist even with DRAM as the storage medium, motivating CXL-SSDs for byte-addressable access to NAND-backed capacity. Surprisingly, however, a stock CXL-SSD remains about 3$\\times$ slower than local DRAM and no faster than an NVMe SSD, while generic prefetching provides little benefit. We present LM-CXD, a CXL-SSD specialized for LLM prefix caching. LM-CXD bridges the semantic gap between the serving engine, which knows which KV chunks will be consumed, and the device, which controls their placement and movement. It makes KV chunks device-visible I/O units, exposes NAND-to-DRAM progress to the serving engine, and uses device DRAM as a GPU-accessible buffer. LM-CXD further coordinates request scheduling with windowed prefetching and pipelines layerwise KV movement with GPU computation to hide NAND latency under limited device DRAM. Across five LLM models, LM-CXD reduces average TTFT over a stock CXL-SSD by up to 2.6$\\times$ with compute asynchronous prefetching and 4.03$\\times$ with layerwise prefetching, achieving TTFT within 1.5$\\times$ of local DRAM on average.",
+  "published": "2026-09-20",
+  "updated": "2026-09-20",
+  "authors": "Hyunsun Chung; Taewan Noh; Minji Kim; Joo-Young Hwang; Hong-Yeon Kim; Youngjae Kim",
+  "primary_category": "cs.AR",
+  "categories": "cs.AR; cs.AI; cs.ET",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2609.26828v1",
+  "query": "weekly"
+ }
+]

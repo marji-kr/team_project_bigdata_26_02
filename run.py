@@ -14,6 +14,7 @@
     python run.py report              # 5. 동향 보고서
     python run.py eval-sample         # 6. 평가용 100건 + 수작업 라벨·시간 기록 양식
     python run.py evaluate            # 7. 정확도·시간 단축률 평가 보고서
+    python run.py weekly              # 주간 업데이트: 새 논문 5편 추가 → 분류 → 보고서 갱신
 """
 from __future__ import annotations
 
@@ -65,6 +66,7 @@ def cmd_clean(args) -> None:
     meta = json.loads((config.RAW_DIR / "collection_meta.json").read_text(encoding="utf-8"))
     ref = date.fromisoformat(meta["reference_date"])
     files = [config.RAW_DIR / f"arxiv_{m}.json" for m, _, _ in collect_mod.month_windows(ref, meta["window_months"])]
+    files += sorted(config.RAW_DIR.glob("weekly_*.json"))  # 주간 업데이트로 추가된 논문도 유지
     rows = [r for f in files for r in json.loads(f.read_text(encoding="utf-8"))]
     with timed("clean", "auto", len(rows)):
         df, log = clean_mod.clean(rows)
@@ -187,6 +189,43 @@ def cmd_all(args) -> None:
     cmd_evaluate(args)
 
 
+def cmd_weekly(args) -> None:
+    """기존 데이터에 없는 최신 논문 n편을 추가하고, 분류·보고서를 갱신한다 (매주 GitHub Actions 가 실행)."""
+    papers = clean_mod.load_papers()
+    with timed("weekly_fetch", "weekly"):
+        new = collect_mod.fetch_latest(args.n, set(papers["arxiv_id"]), clean_mod.is_relevant)
+    today = date.today().isoformat()
+    log_path = config.RUNS_DIR / "weekly_log.csv"
+    config.RUNS_DIR.mkdir(parents=True, exist_ok=True)
+    if not log_path.exists():
+        log_path.write_text("date,added,arxiv_ids\n", encoding="utf-8")
+    with log_path.open("a", encoding="utf-8") as f:
+        f.write(f"{today},{len(new)},{' '.join(r['arxiv_id'] for r in new)}\n")
+    if not new:
+        print("[weekly] 새 논문 없음")
+        return
+
+    raw = config.RAW_DIR / f"weekly_{today}.json"
+    prev = json.loads(raw.read_text(encoding="utf-8")) if raw.exists() else []
+    raw.write_text(json.dumps(prev + new, ensure_ascii=False, indent=1), encoding="utf-8")
+    add = pd.DataFrame(new).assign(month=lambda d: d["published"].str[:7])[papers.columns]
+    pd.concat([papers, add]).to_csv(P / "papers.csv", index=False, encoding="utf-8-sig")
+    for r in new:
+        print(f"[weekly] + ({r['published']}) {r['title'][:80]}")
+    print(f"[weekly] {len(new)}편 추가 → 총 {len(papers) + len(new)}편")
+
+    args.approach, args.eval_only = "keyword", False
+    cmd_classify(args)
+    from trendlab import classify_llm as llm_mod
+    use_llm = llm_mod.has_credentials()
+    if use_llm:  # 이미 분류한 논문은 캐시되므로 새 논문만 API 비용이 든다
+        args.approach = "llm"
+        cmd_classify(args)
+        cmd_summarize(args)
+    args.approach = "llm" if use_llm else "keyword"
+    cmd_report(args)
+
+
 def main() -> None:
     p = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -202,12 +241,14 @@ def main() -> None:
     s = sub.add_parser("eval-sample"); s.add_argument("--n", type=int, default=config.EVAL_SAMPLE_SIZE)
     s.add_argument("--overwrite", action="store_true", help="기존 평가 샘플(수작업 라벨 포함)을 덮어씀")
     sub.add_parser("evaluate")
+    s = sub.add_parser("weekly"); s.add_argument("--n", type=int, default=5, help="추가할 논문 수 (기본 5)")
+    s.add_argument("--model", **model)
     s = sub.add_parser("all"); s.add_argument("--reference-date"); s.add_argument("--no-llm", action="store_true")
     s.add_argument("--model", **model)
 
     args = p.parse_args()
     {"collect": cmd_collect, "clean": cmd_clean, "classify": cmd_classify, "summarize": cmd_summarize,
-     "report": cmd_report, "eval-sample": cmd_eval_sample, "evaluate": cmd_evaluate, "all": cmd_all}[args.cmd](args)
+     "report": cmd_report, "eval-sample": cmd_eval_sample, "evaluate": cmd_evaluate, "weekly": cmd_weekly, "all": cmd_all}[args.cmd](args)
 
 
 if __name__ == "__main__":

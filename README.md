@@ -30,6 +30,7 @@ eval-sample ─▶ (사람이 100건 라벨링 + 시간 기록) ─▶ evaluate 
 
 ```
 team/
+├── .github/workflows/weekly.yml  # 매주 자동 업데이트 (GitHub Actions)
 ├── run.py                  # 실행 진입점 (명령어 목록은 python run.py -h)
 ├── config.py               # 분야·검색식·기간·상한·모델·성공 기준 등 설정
 ├── src/trendlab/
@@ -46,7 +47,7 @@ team/
 │   ├── raw/                # arXiv 원본 (월별 JSON)
 │   ├── processed/          # papers.csv, labels_*.csv, monthly_*.csv, trend_table_*.csv
 │   ├── eval/               # eval_sample.csv (수작업 라벨), manual_timing.csv (수작업 시간)
-│   └── runs/               # timings.csv (자동 단계 시간), llm_usage.csv (토큰 사용량)
+│   └── runs/               # timings.csv (자동 단계 시간), llm_usage.csv (토큰), weekly_log.csv (주간 추가 기록)
 └── outputs/
     ├── figures/            # monthly_counts.png, topic_share.png, method_share.png
     └── reports/            # trend_report_keyword.md, trend_report_llm.md, evaluation_report.md
@@ -92,6 +93,21 @@ python run.py summarize                             # 4. 주제별 동향 요약
 python run.py report                                # 5. 동향 보고서 (llm 라벨이 있으면 llm 기준)
 python run.py report --approach keyword             #    키워드 기준 보고서
 ```
+
+### 주간 업데이트 (매주 새 논문 5편 추가)
+
+```bash
+python run.py weekly          # 기존 데이터에 없는 최신 논문 5편 추가 → 분류 → 보고서 갱신
+python run.py weekly --n 10   # 개수 변경
+```
+
+- 추가된 논문 원본은 `data/raw/weekly_날짜.json`, 기록은 `data/runs/weekly_log.csv` 에 쌓인다.
+- `python run.py all` 로 처음부터 다시 수집해도 주간 추가분은 유지된다.
+- **자동 실행**: GitHub Actions(`.github/workflows/weekly.yml`)가 매주 월요일 09:00(KST)에 실행하고 결과를 저장소에 커밋한다.
+  컴퓨터가 꺼져 있어도 된다. 내 드라이브 폴더에 반영하려면 `git pull`.
+  - 수동 실행: GitHub 저장소 → Actions → Weekly paper update → Run workflow
+  - LLM 분류까지 자동으로 하려면: Settings → Secrets and variables → Actions → `ANTHROPIC_API_KEY` 등록
+    (없으면 키워드 분류로만 갱신)
 
 ### 성공 기준 평가 (문제정의서 4절)
 

@@ -22,6 +22,12 @@ def _norm_title(t: str) -> str:
     return re.sub(r"[^a-z0-9]", "", t.lower())
 
 
+def is_relevant(title: str, abstract: str, categories: str) -> bool:
+    """제목+초록에 ML 용어가 있고, 금융 용어가 있거나 q-fin 카테고리면 관련 논문."""
+    text = f"{title} {abstract}"
+    return bool(ML_RE.search(text)) and (bool(FIN_RE.search(text)) or "q-fin" in categories)
+
+
 def clean(rows: list[dict]) -> tuple[pd.DataFrame, dict]:
     df = pd.DataFrame(rows)
     log = {"raw_rows": len(df)}

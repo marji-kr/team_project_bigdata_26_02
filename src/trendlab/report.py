@@ -95,6 +95,10 @@ def write_trend_report(df, labels, counts, share, trend, m_share, summaries, app
         monthly = " | ".join(f"{share.loc[m, r.label] * 100:.0f}%" for m in months)
         L.append(f"| {names.get(r.label, r.label)} | {r.papers} | {r.overall_share * 100:.1f}% | {monthly} | {r.change_pp:+.1f} |")
 
+    small = [f"{m} ({int(counts.loc[m].sum())}건)" for m in months if counts.loc[m].sum() < 30]
+    if small:
+        L += ["", f"> ⚠️ 논문이 30건 미만인 달은 비중이 크게 흔들리므로 해석에 주의: {', '.join(small)}"]
+
     movers = trend[trend["label"] != "other"].sort_values("change_pp")
     L += ["", "## 3. 증가·감소 주제", ""]
     for title, rows in [("증가", movers.tail(3)[::-1]), ("감소", movers.head(3))]:
