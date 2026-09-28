@@ -528,3 +528,8 @@
 2609.25144,forecasting,other
 2609.24175,portfolio,llm
 2609.26828,other,llm
+2609.31578,trading,deep_seq
+2609.31390,text_altdata,llm
+2609.31013,text_altdata,llm
+2609.30940,credit_fraud,llm
+2609.30880,forecasting,generative
