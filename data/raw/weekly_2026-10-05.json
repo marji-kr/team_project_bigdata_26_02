@@ -1,0 +1,67 @@
+[
+ {
+  "arxiv_id": "2610.03598",
+  "title": "When a Correct Reward Is Not Enough: Diagnosing and Guiding PPO in an Analytically Solved Broker-Trader Game",
+  "abstract": "Reinforcement learning (RL) is increasingly used for financial optimal-control problems when complex dynamics make analytical strategies difficult to obtain. There are financial mathematics literactures which provides many solved models whose equations and controls could evaluate and guide learning; we ask whether RL can exploit these results. We place a proximal policy optimisation (PPO) agent in an analytically solved continuous-time broker--trader game. PPO replaces the broker and chooses its trading speed while interacting with an informed trader and stochastic uninformed order flow. We derive a finite-step reward from the broker's continuous-time payoff and verify its discrete implementation through grid refinement and an exact one-step identity. With zero uninformed flow, a validation-selected PPO--FFNN approaches the reference action. With stochastic uninformed flow, the tested PPO--FFNN and PPO--LSTM remain inaccurate, although supervised learning confirms that their actors can represent the action. Monte Carlo diagnostics show that their critics do not reliably rank nearby actions; potential-based reward shaping also gives no reliable improvement. Under partial information, a causal certainty-equivalent controller based on the broker's observable history remains close to the reference, while PPO has larger errors and lower payoffs. Finally, we freeze the analytical policy and train PPO to adjust it after the execution cost changes. Halving the cost yields a repeatable improvement that closes \\(2.22\\%\\) of the gap to the changed-cost reference. The analytical solution therefore provides both a benchmark for diagnosing RL and a useful starting policy for adaptation.",
+  "published": "2026-10-02",
+  "updated": "2026-10-02",
+  "authors": "Siu Tung Wong; Carlo Campajola",
+  "primary_category": "q-fin.TR",
+  "categories": "q-fin.TR; cs.AI",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2610.03598v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2610.03406",
+  "title": "PreFER: Interactive Robo-Advisor with Scoring Mechanism",
+  "abstract": "We propose an interactive robo-advising framework that learns personalized risk preferences from scores provided by clients. The resulting preference-learning problem is closely related to inverse reinforcement learning (IRL), as the robo-advisor infers the client's latent reward specification from feedback. The robo-advisor interacts with clients iteratively as follows. At each interaction time, the advisor generates investment advice based on the optimal policy distribution derived from an inferred personalized risk preference. The client scores the advice. The advisor updates its assessment of the client's risk preference based on the feedback. This learning procedure motivates us to investigate discrete-time Predictable Forward Exploratory Reward (PreFER) processes and derive an exploratory investment strategy. By interpreting the score as the acceptance probability of a piece of advice, our inverse learning procedure learns the client's exploratory investment distribution using the acceptance-rejection method pioneered by von Neumann. Under CARA preferences, we show that, even though the scores contain noise, the robo-advisor can identify the client's current risk aversion after a sufficiently large number of interactions. The PreFER process then carries the learned preference forward and generates future recommendations under updated market conditions.",
+  "published": "2026-10-02",
+  "updated": "2026-10-02",
+  "authors": "Yuwei Wang; Hoi Ying Wong",
+  "primary_category": "q-fin.MF",
+  "categories": "q-fin.MF",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2610.03406v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2610.03128",
+  "title": "Trading Strategy Optimization via Textual Gradient",
+  "abstract": "Quantitative trading strategy design aims to discover trading programs from historical data that remain effective in future markets, which can be viewed as a black-box program optimization problem. LLM-based textual gradients offer a promising approach by providing explicit optimization directions for iterative strategy refinement. However, directly applying textual gradients faces two challenges: (1) optimization is myopic, underutilizing experience from previous evaluations; and (2) aggregate backtest feedback overlooks temporal robustness, potentially favoring strategies that perform well only in specific market periods. To address these challenges, we propose TradeGrad, an experience-guided textual-gradient framework for robust trading strategy optimization. TradeGrad leverages accumulated optimization experience to estimate textual gradients and employs multi-scale revisions for both strategy exploration and refinement. It further introduces the Cross-Period Robust Objective (CPRO), which emphasizes performance in unfavorable historical periods to promote temporal robustness. Experiments on cross-sectional and time-series strategy design in Chinese A-share and U.S. equity markets show that TradeGrad achieves the best in-sample and out-of-sample performance across all four settings. Notably, its Chinese cross-sectional strategy achieves 27.99% annualized return, 12.19% maximum drawdown, and a Sharpe ratio of 1.63, approximately 68% higher than the CSI 300 benchmark. Further analyses validate the proposed components and show consistent improvements in both in-sample and out-of-sample performance throughout optimization. The code is available at https://github.com/transcend-0/TradeGrad.",
+  "published": "2026-10-02",
+  "updated": "2026-10-02",
+  "authors": "Chaoqun Yang; Qian Wang; Fengbin Zhu; Xinyu Lin; Bingsheng He; Roger Zimmermann; Tat-Seng Chua",
+  "primary_category": "cs.AI",
+  "categories": "cs.AI",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2610.03128v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2610.03080",
+  "title": "MintEval: Do LLMs Implement the Trading Strategy You Asked For? A Behavioural-Equivalence Benchmark for Natural-Language-to-Strategy Code",
+  "abstract": "Large language models are moving from producing trading signals to writing the code that executes them. The failure mode of the second role is silent: generated code runs, a backtest plots, yet the risk logic that the trader described is not the logic being executed. Existing code benchmarks test functional correctness on unit tests and finance benchmarks test forecasting; neither measures whether an implementation behaves like the strategy that was asked for. We introduce MintEval, a benchmark in which reference strategies are generated programmatically from a library of composable building blocks, back-translated into colloquial trader instructions, and re-implemented by the model under test. Generated and reference programs are executed bar by bar on identical market data and frictions, and compared on their actions rather than on code similarity or profit: alpha is differenced away. MintEval v0 contains 800 tasks on BTCUSDT 15-minute data, stratified by an execution-measured state-span complexity tau that is decoupled from description length. Low-cost models reach a mean ActionMatch of at most 0.544 and reproduce at most 0.087 of tasks exactly; on a stratified subset of 200 tasks a frontier model (Claude Opus 5.5) reaches 0.889 and reproduces 0.575 exactly, yet still fails silently on 0.275 of tasks. Given a menu of building blocks, models identify the strategy almost perfectly, yet 79.2% of the implementations whose specification was read correctly diverge on more than 10% of active bars. The LLM judge of a recent strategy-generation benchmark, applied verbatim, accepts every one of these silent failures.",
+  "published": "2026-10-02",
+  "updated": "2026-10-02",
+  "authors": "Siyu Wang; Yifan Wang; Yuecheng He",
+  "primary_category": "cs.SE",
+  "categories": "cs.SE; cs.CL; cs.LG; q-fin.TR",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2610.03080v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2610.03076",
+  "title": "Shapley-based Structural Analysis of Neural Calibration for Stochastic Volatility Models",
+  "abstract": "Neural network-based approaches have emerged as efficient alternatives to traditional optimization-based procedures for the calibration of stochastic volatility models. However, existing work has focused primarily on predictive accuracy, with comparatively little attention devoted to understanding the structure of the learned inverse calibration mappings. In this work, we analyze neural calibration mappings for the Heston and rough Heston models across multilayer perceptron, highway, and softmax-parametrized highway architectures, using complementary Shapley-based methods from explainable AI. Specifically, we consider SHAP and $ν$SHAP explanations, which capture distinct, complementary notions of feature relevance, corresponding to sensitivity and sufficiency of feature subsets, respectively. Short maturities and smile wings consistently dominate parameter inference, and the dominant attribution structure remains qualitatively stable across architectures despite differences in predictive accuracy and parameter count. Parameter-specific differences between SHAP and $ν$SHAP further reveal how distinct regions of the implied volatility surface contribute to parameter recovery and expose substantial redundancy in the calibration input. Building on this redundancy, we show that $ν$SHAP explanations can guide a significant reduction in input dimensionality for the rough Heston model while matching calibration accuracy relative to the full implied volatility surface. These findings demonstrate that complementary Shapley-based methods provide structural insight into learned inverse calibration mappings beyond predictive error metrics, and offer a practical route to feature selection in neural calibration problems.",
+  "published": "2026-10-02",
+  "updated": "2026-10-02",
+  "authors": "Shaïn Afzali; Serena Della Corte; Antonis Papapantoleon",
+  "primary_category": "q-fin.CP",
+  "categories": "q-fin.CP",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2610.03076v1",
+  "query": "weekly"
+ }
+]

@@ -533,3 +533,8 @@
 2609.31013,text_altdata,llm
 2609.30940,credit_fraud,llm
 2609.30880,forecasting,generative
+2610.03598,trading,llm
+2610.03406,portfolio,rl
+2610.03128,text_altdata,llm
+2610.03080,text_altdata,llm
+2610.03076,derivatives,deep_seq

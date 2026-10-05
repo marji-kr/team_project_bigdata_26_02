@@ -12,3 +12,6 @@ timestamp,stage,approach,seconds,n_papers,note
 2026-09-28T04:58:22,weekly_fetch,weekly,3.55,,
 2026-09-28T04:58:24,classify,keyword,1.39,534,
 2026-09-28T04:58:26,report,keyword,1.53,534,
+2026-10-05T05:12:17,weekly_fetch,weekly,3.65,,
+2026-10-05T05:12:18,classify,keyword,0.64,539,
+2026-10-05T05:12:19,report,keyword,0.87,539,
