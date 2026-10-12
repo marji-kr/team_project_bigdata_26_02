@@ -538,3 +538,8 @@
 2610.03128,text_altdata,llm
 2610.03080,text_altdata,llm
 2610.03076,derivatives,deep_seq
+2610.13126,portfolio,rl
+2610.12718,risk,llm
+2610.12375,crypto,llm
+2610.12148,forecasting,deep_seq
+2610.12537,trading,deep_seq
