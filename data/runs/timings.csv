@@ -21,3 +21,6 @@ timestamp,stage,approach,seconds,n_papers,note
 2026-10-19T04:16:49,weekly_fetch,weekly,3.71,,
 2026-10-19T04:16:50,classify,keyword,1.07,549,
 2026-10-19T04:16:53,report,keyword,1.33,549,
+2026-10-26T04:20:26,weekly_fetch,weekly,3.74,,
+2026-10-26T04:20:27,classify,keyword,0.95,554,
+2026-10-26T04:20:29,report,keyword,1.14,554,
