@@ -1,0 +1,67 @@
+[
+ {
+  "arxiv_id": "2610.41689",
+  "title": "QBX: A Compiler for Well-Formed, Auditable Alpha Programs",
+  "abstract": "Formulaic alpha miners increasingly differ in how they generate candidates, yet each system typically couples its own representation, evaluator, and selector into a bespoke pipeline whose results are difficult to reproduce or compare. We present QBX, a compiler that defines a well-formed, auditable space of alpha programs. A finite, versioned block registry and whole-strategy port-DAG language define the candidate space; the compiler either rejects a proposal with structured diagnostics or emits an evidence-carrying IR with types, time-availability effects, executable linkage, and Merkle-style content identities. Compiler-closed actions keep search inside the admitted space, node identities support incremental evaluation, and context-bound root identities govern program deduplication and trial provenance. The availability-effect system rejects contract-visible look-ahead while admitting legal point-in-time forecasts. On Chinese A-share panels, evaluation-valid proposals increase from 26.8% for free strings and 36.4% for a grammar-only control to 97.7% for typed programs. Incremental evaluation replays search lineages 7.5 times faster with numerical parity, while the availability checker admits zero registered-contract violations across 23,342 candidates. Under matched LLM-call budgets, compiler-closed search reaches the pool-specific diagnostic frontier with substantially fewer calls. These results concern validity, reuse, and search efficiency within the registered vocabulary, not an increase in the information available from the market panel.",
+  "published": "2026-10-30",
+  "updated": "2026-10-30",
+  "authors": "Yichong Bai; Kaigui Bian",
+  "primary_category": "cs.CE",
+  "categories": "cs.CE; q-fin.CP",
+  "doi": "10.1145/3858063.3858768",
+  "url": "http://arxiv.org/abs/2610.41689v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2610.41405",
+  "title": "Conditional Neural SDEs for Financial Time-Series Generation",
+  "abstract": "Conditional generation of time-series paths is a central problem in probabilistic modeling, where the goal is to simulate future trajectories that are both realistic and responsive to external context. It has direct applications in finance and economics. Neural stochastic differential equations provide a natural framework for this task by combining continuous-time stochastic dynamics with learnable drift and diffusion functions. However, directly modeling the target state can be unstable in conditional settings, especially when the target and conditioning variables have strong level dependence, limited training data, or different dimensions.We propose a residualanchor Neural SDE architecture that decomposes the target into a learned conditional anchor and a stochastic residual. The anchor captures the context-dependent baseline, while the Neural SDE (Stochastic Differential Equation) models the residual dynamics around this baseline. This separation reduces the burden on the stochastic dynamics and generalizes spread-based representations to more general conditioning settings.We evaluate the approach on real-world financial time series, including conditional interest-rate scenarios and a comparison with a time-series foundation model. The results show that the proposed model can generate plausible conditional paths, maintain competitive point accuracy, and provide calibrated uncertainty estimates.",
+  "published": "2026-10-30",
+  "updated": "2026-10-30",
+  "authors": "Sina Molavipour; Alireza M. Javid; Björn Löfdahl; Mikhail Nechaev",
+  "primary_category": "stat.ML",
+  "categories": "stat.ML; cs.LG",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2610.41405v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2610.41019",
+  "title": "Neural Network Methods in the 2BSDE Formalism for Solving the High-Dimensional Black--Scholes Equation with Transaction Costs",
+  "abstract": "A 2BSDE system is written down for a $(D+1)$-dimensional Black--Scholes partial differential equation (PDE) with the Leland transaction cost model which incorporates the sign of the curvature. The 2BSDE system takes input from the ``speed'' (derivative of the curvature). This system is solved using a single ResNet neural network which learns both the solution to the PDE as well as the degrees of freedom in the curvature matrix. The network is used to learn the price of derivatives such as call options and butterfly spreads on geometric baskets for $D=10,100$ achieving a time-averaged RMSE of less than $0.1$ in each case.",
+  "published": "2026-10-29",
+  "updated": "2026-10-29",
+  "authors": "Guhesh Kumaran",
+  "primary_category": "math.OC",
+  "categories": "math.OC; q-fin.CP",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2610.41019v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2610.40985",
+  "title": "The psychophysics of affect in large language models",
+  "abstract": "Good decisions often require considering how outcomes will feel. Yet large language models (LLMs) increasingly enter decision workflows, despite little being known about how they map outcomes to feelings or use those mappings in choice. We tested how LLMs anticipated gambling or stock-trading outcomes would feel and whether they incorporated these ratings into choice. When outcomes were rated in isolation, ratings exhibited diminishing sensitivity to magnitude, resembling human value functions; but models rated gains more intensely than equivalent losses, an inversion of canonical loss aversion we call silicon gain amplification. When outcomes were rated together, enabling direct comparison, ratings linearised. In choice, the gain-loss asymmetry largely disappeared, and models' own ratings did not reliably explain their choices better than monetary utility did. These findings reveal malleable mappings from outcomes to affect, raising questions about whether and how agentic LLMs should incorporate anticipated feelings into decisions.",
+  "published": "2026-10-29",
+  "updated": "2026-10-29",
+  "authors": "Joseph Marks; Marius C. Vollberg",
+  "primary_category": "cs.AI",
+  "categories": "cs.AI; cs.CL",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2610.40985v1",
+  "query": "weekly"
+ },
+ {
+  "arxiv_id": "2610.40858",
+  "title": "FARO: Function-Space Adaptive Return-to-Risk Optimization via Cross-Block Equal-Risk-Contribution Budget Allocation",
+  "abstract": "Training a large language model is compute-bound, and current recipes divide the work between optimizers by hand: orthogonalized momentum for attention and MLP matrices, Adam-style updates for the rest. This division rests on human priors about which layer type deserves which geometry, and it fixes a single global update budget that every parameter block shares. We introduce FARO, a function-space adaptive optimizer that makes the partition of parameters into blocks the unit of decision. FARO gives each block a geometry by its realized counterfactual return, then freezes the routes and reallocates the frozen per-block budget by cross-block equal risk contribution (ERC), the risk-parity principle from portfolio theory. On a GPT-style model trained on FineWeb, the framework gives two results. First, its FARO-Adaptive arm reaches 3.2780 nats at the full schedule, matching NorMuonAndAdam (3.2794), the best hand-designed recipe: it recovers the human prior without hand-setting per-layer geometry. Second, FARO-ERC improves on that arm: it lowers the clean-data loss at every one of 6 seeds, by 0.0136 nats on average, a modest but robust gain. Its sign test, paired test, and confidence interval all agree, and it exceeds the measured run-to-run noise at no added time or memory. It works by trimming the riskiest blocks rather than expanding the safest, and it holds up under a corrupted stream, still lowering the mean loss and winning the seed majority. The source code is available at https://github.com/wxj630/FARO.",
+  "published": "2026-10-29",
+  "updated": "2026-10-29",
+  "authors": "Xiaojun Wu; Cehao Yang; Xuhui Jiang; Chengjin Xu; Jia Li; Jian Guo",
+  "primary_category": "cs.LG",
+  "categories": "cs.LG; cs.CL",
+  "doi": "",
+  "url": "http://arxiv.org/abs/2610.40858v1",
+  "query": "weekly"
+ }
+]
